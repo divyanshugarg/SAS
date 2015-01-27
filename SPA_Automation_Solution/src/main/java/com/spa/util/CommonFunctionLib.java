@@ -4,6 +4,13 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.remote.MobilePlatform;
+
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +33,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -33,6 +41,8 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -131,9 +141,11 @@ public class CommonFunctionLib extends DetailedLogs {
 	{
 		try
 		{
+			iOSAppPath = properties.getProperty("AppName");
+			File appDir = new File(System.getProperty("user.dir")+ "\\aut");
+			File path = new File(appDir,iOSAppPath.trim());
 			ShutDownDriver();
-			startAppium();
-			/**
+			/**  
 			 * Refer the below link to know about different capabilities of Appium server.
 			 * http://appium.io/slate/en/v1.3.4/?java#appium-server-capabilities
 			 */
@@ -141,32 +153,32 @@ public class CommonFunctionLib extends DetailedLogs {
 			{
 			case "Windows-Android-Simulator":
 				createStartAndroidEmulator();
-				iOSAppPath = "D:/Andriod/moblipoc/aut/resigned-com.mobli-1.apk";
+//				startAppium();
 				objCapabilities = new DesiredCapabilities();
-				objCapabilities.setCapability(CapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
-			    objCapabilities.setCapability(CapabilityType.PLATFORM, "Windows");
-			    objCapabilities.setCapability("app", properties.getProperty("AndroidVersion"));
-			    objCapabilities.setCapability("deviceName", "Android Emulator");
-			    objCapabilities.setCapability("automationName", "Selendroid");
-				objCapabilities.setCapability(CapabilityType.BROWSER_NAME, "Android");
-				objCapabilities.setCapability("platformName", "Android");
+				objCapabilities.setCapability(MobileCapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
+			    objCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+			    objCapabilities.setCapability("app",path);
+			    objCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");  //Android Emulator
+			   // objCapabilities.setCapability("automationName", "Appium");
+				objCapabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "android");
+				objCapabilities.setCapability("session-override", true);
 				objCapabilities.setCapability("autoLaunch", true);
 				objCapabilities.setCapability("language", "en");
 				objCapabilities.setCapability("fullReset", "true");
 				objCapabilities.setCapability("locale", "US");
 				objCapabilities.setCapability("takesScreenshot", true);
-				objCapabilities.setCapability("deviceReadyTimeout", "60");  //Timeout in seconds while waiting for device to become ready
-				objCapabilities.setCapability("androidDeviceReadyTimeout", "60"); //Timeout in seconds used to wait for a device to become ready after booting
+				objCapabilities.setCapability("deviceReadyTimeout", "300");  //Timeout in seconds while waiting for device to become ready
+				objCapabilities.setCapability("androidDeviceReadyTimeout", "300"); //Timeout in seconds used to wait for a device to become ready after booting
 				objCapabilities.setCapability("avdLaunchTimeout", "300000"); //How long to wait in milliseconds for an avd to launch and connect to ADB (default 120000)
 				objCapabilities.setCapability("newCommandTimeout", "18000");
 				objCapabilities.setCapability("session-override", true);
-//				objCapabilities.setCapability("device", "@default");
-//				objCapabilities.setCapability("avd", "AVD_for_Galaxy_Nexus_by_Google");  //Name of avd to launch
-				objCapabilities.setCapability("appPackage", "com.mobli");
-//				objCapabilities.setCapability("appActivity", "com.mobli");
-//				objCapabilities.setCapability("appWaitActivity", ".ui.WelcomeScreen");
+				objCapabilities.setCapability("device", "@default");
+				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
+//				objCapabilities.setCapability("appPackage", "com.yoolotto.android");
+//				objCapabilities.setCapability("appActivity", "activities.MainActivity");
+//				objCapabilities.setCapability("appWaitActivity", "");
 //				objCapabilities.setCapability("appWaitPackage", "com.mobli");
-				objCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+//				objCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 				try {   
 					driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), objCapabilities);
 					//driver = new AndroidDriver(new URL("http://" + properties.getProperty("machineIP") + ":" + properties.getProperty("PortNumber") + "/wd/hub"), objCapabilities);
@@ -199,11 +211,8 @@ public class CommonFunctionLib extends DetailedLogs {
         String line = null;
 		 try 
          { 
-			 String TASKLIST = "cmd /c appium";
+			 String TASKLIST = "tasklist /FI \"STATUS eq running\" /FI \"IMAGENAME eq appium.exe\"";
              Process p=Runtime.getRuntime().exec(TASKLIST); 
-             Thread.sleep(3000);
-             TASKLIST = "tasklist /FI \"STATUS eq running\" /FI \"IMAGENAME eq appium.exe\"";
-             p=Runtime.getRuntime().exec(TASKLIST); 
              //p.waitFor(); 
              BufferedReader reader=new BufferedReader(
                  new InputStreamReader(p.getInputStream())
@@ -213,7 +222,47 @@ public class CommonFunctionLib extends DetailedLogs {
             	 if(line.toLowerCase().contains("appium.exe")){
             		 return true;
             	 }
-             } 
+             }
+       //      System.out.println("ANDROID_HOME : "+System.getenv("ANDROID_HOME"));
+         //    System.out.println("PATH : "+System.getenv("PATH"));
+             DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+             DefaultExecutor executor = new DefaultExecutor();
+             executor.setExitValue(1);
+             CommandLine command = new CommandLine("appium.exe");
+             //command.addArgument("appium", false);
+             command.addArgument("–address", false);
+             command.addArgument("127.0.0.1");
+             command.addArgument("-port", false);
+             command.addArgument("4723");
+             command.addArgument("-bootstrap-port", false);
+             command.addArgument("4724");
+             command.addArgument("-full-reset", false);
+             command.addArgument("-local-timezone", false);
+             command.addArgument("-avd", false);
+             command.addArgument("myAndroidEmulator");
+             command.addArgument("-log", false);
+             command.addArgument("-pre-launch", false);
+             command.addArgument("-session-override", false);
+             executor.execute(command, resultHandler);
+             Thread.sleep(10000);
+/*			 TASKLIST = "cmd /c appium";
+             p=Runtime.getRuntime().exec(TASKLIST); 
+             Thread.sleep(3000);*/
+             for(int i=0;i<10;i++){
+            	 TASKLIST = "tasklist /FI \"STATUS eq running\" /FI \"IMAGENAME eq appium.exe\"";
+            	 p=Runtime.getRuntime().exec(TASKLIST); 
+            	 //p.waitFor(); 
+            	 reader=new BufferedReader(
+            			 new InputStreamReader(p.getInputStream())
+            			 ); 
+            	 while((line = reader.readLine()) != null) 
+            	 { 
+            		 if(line.toLowerCase().contains("appium.exe")){
+            			 return true;
+            		 }
+            	 }
+            	 Thread.sleep(1500);
+             }
          }
          catch(IOException e1) {
         	 e1.printStackTrace();
@@ -227,57 +276,121 @@ public class CommonFunctionLib extends DetailedLogs {
 	 * To Do : Need to work on it.
 	 * @return
 	 */
-	public String createStartAndroidEmulator(){
+	public Boolean createStartAndroidEmulator(){
 		String line = null;
 		try 
 		{ 
-			Process p=Runtime.getRuntime().exec("cmd /c android list targets"); 
-			p.waitFor(); 
-			BufferedReader reader=new BufferedReader(
-					new InputStreamReader(p.getInputStream())); 
+			String command = "adb shell getprop ro.build.version.release";
+			Process p=Runtime.getRuntime().exec(command); 
+			Thread.sleep(2000);
 			BufferedReader error =new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while((line = reader.readLine()) != null) 
-			{ 
-				System.out.println(line);
-			} 
-			while ((line = error.readLine()) != null){
-				System.out.println(line);
+			BufferedReader reader=new BufferedReader(new InputStreamReader(p.getInputStream())); 
+			boolean isAlreadyRunning = false;
+			if((line = error.readLine()) != null){
+				error.close();
 			}
-			error.close();
-			p=Runtime.getRuntime().exec("cmd /c android create avd -n myAndroidEmulator -t 16 --force"); 
-			p.waitFor(); 
-			reader=new BufferedReader(
-					new InputStreamReader(p.getInputStream())
-					); 
-			while((line = reader.readLine()) != null) 
-			{ 
-				System.out.println(line);
-			} 
-
-			p=Runtime.getRuntime().exec("cmd /c adb devices"); 
-			p.waitFor(); 
-			reader=new BufferedReader(
-					new InputStreamReader(p.getInputStream())
-					); 
-			while((line = reader.readLine()) != null) 
-			{ 
-				System.out.println(line);
-			} 
-
-			p=Runtime.getRuntime().exec("cmd /c emulator -avd myAndroidEmulator -gpu on"); 
-			p.waitFor(); 
-			reader=new BufferedReader(
-					new InputStreamReader(p.getInputStream())
-					); 
-			while((line = reader.readLine()) != null) 
-			{ 
-				System.out.println(line);
-			} 
-			//emulator -avd myAndroidEmulator
+			else{
+				while ((line = reader.readLine()) != null){
+					System.out.println(line);
+					if(line.toLowerCase().contains(properties.getProperty("AndroidVersion"))){
+						isAlreadyRunning = true;
+						break;
+					}
+				}
+			}
+			if(!isAlreadyRunning){
+				command = "cmd /c android create avd -n myAndroidEmulator -t 19 --force";
+				p=Runtime.getRuntime().exec(command); 
+				Thread.sleep(2000);
+				reader=new BufferedReader(new InputStreamReader(p.getInputStream())); 
+				error =new BufferedReader(new InputStreamReader(p.getErrorStream()));
+				if(reader!=null && reader.ready() && error!=null && error.readLine()== null) 
+				{ 
+					command = "cmd /c emulator -avd myAndroidEmulator -gpu on";
+					p=Runtime.getRuntime().exec(command); 
+					Thread.sleep(15000);
+					boolean isEmulatorStarted = false;
+					for(int i=0;i<10;i++){
+						command = "cmd /c adb devices";
+						p=Runtime.getRuntime().exec(command); 
+						Thread.sleep(1500);
+						reader=new BufferedReader(new InputStreamReader(p.getInputStream()));
+						while ((line = reader.readLine()) != null){
+							//System.out.println(line);
+							if(line.toLowerCase().contains("device")
+									&& !line.toLowerCase().contains("list of devices")){
+								isEmulatorStarted = true;
+								break;
+							}
+						}
+						if(isEmulatorStarted){
+							break;
+						}
+						else{
+							Thread.sleep(1500);
+						}
+					}
+					if(isEmulatorStarted) 
+					{ 
+						Thread.sleep(15000);
+						command = "adb shell getprop ro.build.version.release";
+						p=Runtime.getRuntime().exec(command); 
+						Thread.sleep(1500);
+						reader=new BufferedReader(new InputStreamReader(p.getInputStream())); 
+						error =new BufferedReader(new InputStreamReader(p.getErrorStream()));
+						while((line = reader.readLine()) != null){
+							System.out.println("Attached Emulator Info: "+line);
+							if(line.toLowerCase().contains(properties.getProperty("AndroidVersion"))){
+								return true; 
+							}
+						}
+					}
+					else{
+						System.out.println("failed to start Android Emulator.");
+						return false;
+					}
+				} 
+				else{
+					System.out.println("failed to create Android Emulator.");
+					return false;
+				}
+			}
+			else{
+				System.out.println("Skip to create and start new emulator because we found similar Android device (version) attached with running environment.");
+				return true;
+			}
 		}
-		catch(IOException e1) {} 
+		catch(IOException e1) {
+			e1.printStackTrace();
+		} 
 		catch(InterruptedException e2) {} 
-		return line;
+		return false;
+	}
+	
+	public int getIdBasedOnAndroidAndAPILevel(String version){
+		try 
+		{ 
+			String line = "";
+			String command = "cmd /c android list target";
+			Process p=Runtime.getRuntime().exec(command); 
+			Thread.sleep(2000);
+			BufferedReader error =new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			BufferedReader reader=new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String id = "";
+			while((line = reader.readLine()) != null){
+				if(line.toLowerCase().contains("id:")){
+					id = line.split(" ")[1];
+				}
+				if(line.toLowerCase().contains(properties.getProperty("AndroidVersion"))
+						&& (line.toLowerCase().contains("name:")||line.toLowerCase().contains("api level:") )){
+					return Integer.parseInt(id); 
+				}
+			}
+		}
+		catch(Exception ex){
+			System.out.println("Failed to get Android target Id based on provided API or Android version.");
+		}
+		return 0;
 	}
 	
 	public void ShutDownDriver()

@@ -60,49 +60,53 @@ public class SAS_Engine {
 		  String DeviceType = "UnknownDevice";
 		  FileReader reader = new FileReader("master_config.properties");
 		  prop.load(reader);
-			if(DeviceName == null){
-				CommonVariables.DeviceName.set(prop.getProperty("deviceType"));
-			}else{
-				CommonVariables.DeviceName.set(DeviceName);
-			}
-			if(DeviceEnvironment == null){
-				CommonVariables.PlatformName.set(prop.getProperty("environment"));
-			}else{
-				CommonVariables.PlatformName.set(DeviceEnvironment);
-			}
-			
-		  
-			DeviceType = context.getCurrentXmlTest().getParameter("browser");
-			if(DeviceType == null){
-				DeviceType = prop.getProperty("deviceType");
-			}
-			CommonVariables.DeviceName.set(DeviceType);
+		  if(DeviceName != null){
+			  CommonVariables.DeviceName.set(DeviceName);
+		  }
+		  else if( context.getCurrentXmlTest().getParameter("DeviceType")!=null){
+			  CommonVariables.DeviceName.set(context.getCurrentXmlTest().getParameter("DeviceType"));
+		  }
+		  else{
+			  CommonVariables.DeviceName.set(prop.getProperty("DeviceType"));
+		  }
+		  System.out.println("Running on Device: "+CommonVariables.DeviceName.get());
 
-			if(context.getCurrentXmlTest().getParameter("platform")==null){
-				CommonVariables.PlatformName.set(prop.getProperty("platform"));
-			}else{
-				CommonVariables.PlatformName.set(context.getCurrentXmlTest().getParameter("platform"));
-			}
+		  if(DeviceEnvironment != null){
+			  CommonVariables.PlatformName.set(DeviceEnvironment);
+		  }
+		  else if( context.getCurrentXmlTest().getParameter("Platform")!=null){
+			  CommonVariables.PlatformName.set(context.getCurrentXmlTest().getParameter("Platform"));
+		  }
+		  else{
+			  CommonVariables.PlatformName.set(prop.getProperty("Platform"));
+		  }
+		  System.out.println("Running on Platform: "+CommonVariables.PlatformName.get());
+
+		  if(DeviceEnvironment == null){
+			  CommonVariables.PlatformName.set(prop.getProperty("Platform"));
+		  }else{
+			  CommonVariables.PlatformName.set(DeviceEnvironment);
+		  }
 		  dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		  startTime = Calendar.getInstance();
 		  System.out.println(dateFormat.format(startTime.getTime()));
 		  CommonVariables.DL = new DetailedLogs();
-		  
+
 		  String timestamp = new SimpleDateFormat("yyyy_MM_dd_hh_mm_sss_a").format(new Date());
 		  String Report_Root_Path = System.getProperty("user.dir")+"/logs/Results/" + timestamp;
 		  CommonVariables.DL.CreateFolder(Report_Root_Path);
-		  
+
 		  Report_Root_Path = System.getProperty("user.dir")+"/logs/Results/" + timestamp + "/" + DeviceType;
 		  CommonVariables.DL.CreateFolder(Report_Root_Path);
-		  
+
 		  CommonVariables.RootResultFolderPath.set(Report_Root_Path);
-		  
-//		  System.out.println(DeviceType + " result path: " + CommonVariables.RootResultFolderPath);
-		  
+
+		  //		  System.out.println(DeviceType + " result path: " + CommonVariables.RootResultFolderPath);
+
 		  CommonVariables.CurrentGlobalLog.set(CommonVariables.DL.StartLogs("Global_Log",Report_Root_Path));
 		  CommonVariables.CurrentGlobalLog.get().info("Staring the Suite");	
-//		  objCommonFunc.AddToLog("info", "Staring the Suite");
-		  
+		  //		  objCommonFunc.AddToLog("info", "Staring the Suite");
+
 		  File highlevellogfile = new File(Report_Root_Path + "/" + "HighLevelLog" + ".log");
 		  FileWriter highlevellogfw = new FileWriter(highlevellogfile.getAbsoluteFile());
 		  CommonVariables.HighLevelLog.set(new BufferedWriter(highlevellogfw));
