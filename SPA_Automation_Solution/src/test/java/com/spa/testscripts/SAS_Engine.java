@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FilenameUtils;
@@ -31,6 +32,7 @@ import com.spa.util.CommonFunctionLib;
 import com.spa.util.CommonVariables;
 import com.spa.util.CustomLog4JLevel;
 import com.spa.util.DetailedLogs;
+import com.spa.util.HTMLReporting;
 
 public class SAS_Engine {
 	AppiumDriver driver;
@@ -39,6 +41,7 @@ public class SAS_Engine {
 	DateFormat dateFormat;
 	Calendar startTime;
 	Calendar endTime;
+	public int itr_cnt=1;
   Properties prop = new Properties();
   
 	  @BeforeTest
@@ -53,6 +56,7 @@ public class SAS_Engine {
 		  CommonVariables.TestCasessHighLevelLog.set(new ArrayList<String>());
 		  CommonVariables.ScenariosHighLevelLog.set(new ArrayList<String>());
 		  CommonVariables.CurrentTestClassResult.set("PASS");
+		  CommonVariables.LastMethodName.set("");
 		  String DeviceName = System.getenv("DeviceName");
 		  String DeviceEnvironment = System.getenv("DeviceEnvironment");
 		  CommonVariables.ExecutionDate.set(GetCurrentTime().split(" ")[0]);
@@ -171,66 +175,90 @@ public class SAS_Engine {
 	  }
 	  
 	  @AfterMethod
-	  public void afterTestCase(ITestResult result){
-		  String DataParameters = "";
-		  try{
-			  String[] TestCasePArametersArray = (String[]) result.getParameters()[0];
-			  DataParameters = Arrays.toString(TestCasePArametersArray);
-		  }catch(java.lang.ClassCastException e){
-			  try{
-				  Object[] arrDataObj= (Object[]) result.getParameters()[0];
-				    for(Object obj: arrDataObj ){
-				    	DataParameters  =DataParameters+obj.toString()+"||";
-				    }
-			  }
-			  catch(java.lang.ClassCastException e1){
-			  DataParameters = Arrays.toString(result.getParameters());
-			  }
-		  }catch(Exception e){
-			  DataParameters = Arrays.toString(result.getParameters());
-//			  e.printStackTrace();
-		  }
-		  if(DataParameters.equals("[]"))
-			  DataParameters ="";
-		  CommonVariables.TotalTCCount.set(CommonVariables.TotalTCCount.get() + 1);
-		  CommonVariables.TCEndTime.set(GetCurrentTime());
-		  String completeclassName = this.getClass().getName();
-		  String testcasename = CommonVariables.CurrentTestCaseName.get();
-		  String CompleteTCName = completeclassName + "." + testcasename;
-		  String testCases_ScreenShot_Folder = CommonVariables.ScenarioResultFolderPath.get() + "/" + "ScreenShots";
-		  
-		  
-		  String TestCaseResult ="";
-		  if (result.getStatus() == ITestResult.FAILURE) {
-			  TestCaseResult = "FAIL";
-			  CommonVariables.CurrentTestClassResult.set("FAIL");
-//			  CommonVariables.CurrentTestCaseResult = "FAIL";
-			  String ScreenShotPath = testCases_ScreenShot_Folder+ "/" + testcasename + "_" + new Date().getTime() + ".jpg";
-			  objCommonFunc.saveScreenshot(ScreenShotPath);
-//			  objCommonFunc.AddToLog("screenshot", ScreenShotPath);
-			  CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel.SCREENSHOT, ScreenShotPath);
-			  CommonVariables.FailTCCount.set(CommonVariables.FailTCCount.get()+1);
-		  }else if (result.getStatus() == ITestResult.SUCCESS){
-			  TestCaseResult = "PASS";
-			  CommonVariables.PassTCCount.set(CommonVariables.PassTCCount.get() + 1);
-		  }else if (result.getStatus() == ITestResult.SKIP){
-			  TestCaseResult = "SKIP";
-			  CommonVariables.SkipTCCount.set(CommonVariables.SkipTCCount.get() + 1);
-		  }else{
-			  TestCaseResult = "UNKNOWN";
-		  }
-		  
-		  CommonVariables.CurrentTestCaseResult.set(TestCaseResult);		  
-		  CommonVariables.TestCasessHighLevelLog.get().add(CommonVariables.CurrentTestCaseName.get() + ":" + TestCaseResult + ":" + DataParameters);
-//		  CommonVariables.CurrentTestCaseLog.info("Stopping the test method");
-		  
-		  try {
-			CommonVariables.HighLevelLog.get().write(CommonVariables.CurrentTestClassName.get() + "\t"+CommonVariables.CurrentTestCaseName.get() + "\t"+TestCaseResult+"\t"+DataParameters+"\t"+CommonVariables.TCStartTime.get() + "\t"+CommonVariables.TCEndTime.get() + "\r\n");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	  public void afterTestCase(Method method, ITestResult result){
+			//*** code to get the Method Description ****************************************************************
+			String MethodDescription = "";
+			java.lang.annotation.Annotation[] annotations = method.getAnnotations();
+			for(java.lang.annotation.Annotation annotation : annotations){
+				if(annotation instanceof org.testng.annotations.Test){
+					org.testng.annotations.Test myAnnotation = (org.testng.annotations.Test) annotation;
+					MethodDescription = myAnnotation.description().toString().replace(",",";");
+					//				  System.out.println("description: " + MethodDescription);
+				}
+			}
+			//***************************************** *************************************************************
+			String testName = method.getName();
+			Integer testResult=result.getStatus();
+			CommonVariables.CurrentTestCaseName.set(testName);
+			String DataParameters = "";
+			try{
+				String[] TestCasePArametersArray = (String[]) result.getParameters()[0];
+				DataParameters = Arrays.toString(TestCasePArametersArray);
+			}catch(java.lang.ClassCastException e){
+				try{
+					Object[] arrDataObj= (Object[]) result.getParameters()[0];
+					for(Object obj: arrDataObj ){
+						DataParameters  =DataParameters+obj.toString()+"||";
+					}
+				}
+				catch(java.lang.ClassCastException e1){
+					DataParameters = Arrays.toString(result.getParameters());
+				}
+			}catch(Exception e){
+				DataParameters = Arrays.toString(result.getParameters());
+				//			  e.printStackTrace();
+			}
+			if(DataParameters.equals("[]"))
+				DataParameters ="";
+			CommonVariables.TotalTCCount.set(CommonVariables.TotalTCCount.get() + 1);
+			CommonVariables.TCEndTime.set(GetCurrentTime());
+			String completeclassName = this.getClass().getName();
+			String testcasename = CommonVariables.CurrentTestCaseName.get();
+			String CompleteTCName = completeclassName + "." + testcasename;
+			String testCases_ScreenShot_Folder = CommonVariables.ScenarioResultFolderPath.get() + "/" + "ScreenShots";
+			String TestCaseResult ="";
+			if (result.getStatus() == ITestResult.FAILURE) {
+				TestCaseResult = "FAIL";
+				CommonVariables.CurrentTestClassResult.set("FAIL");
+				//			  CommonVariables.CurrentTestCaseResult = "FAIL";
+				String ScreenShotPath = testCases_ScreenShot_Folder+ "/" + testcasename + "_" + new Date().getTime() + ".jpg";
+				if(CommonVariables.getDriver()!=null)
+					if(!objCommonFunc.saveScreenshot(ScreenShotPath)){
+						ScreenShotPath = "Error Occurred while taking screenshot";
+					}
+				//			  objCommonFunc.AddToLog("screenshot", ScreenShotPath);
+				CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel.SCREENSHOT, ScreenShotPath);
+				CommonVariables.FailTCCount.set(CommonVariables.FailTCCount.get()+1);
+			}else if (result.getStatus() == ITestResult.SUCCESS){
+				TestCaseResult = "PASS";
+				CommonVariables.PassTCCount.set(CommonVariables.PassTCCount.get() + 1);
+			}else if (result.getStatus() == ITestResult.SKIP){
+				TestCaseResult = "SKIP";
+				CommonVariables.SkipTCCount.set(CommonVariables.SkipTCCount.get() + 1);
+			}else{
+				TestCaseResult = "UNKNOWN";
+			}
+			String TestDescriptionKey = CommonVariables.CurrentTestClassName.get() + "-" + CommonVariables.CurrentTestCaseName.get();
+			if(CommonVariables.LastMethodName.get().equals(testName)){
+				itr_cnt++;
+			}else{
+				itr_cnt = 1;
+			}
+			String NewCompleteTCName = CompleteTCName + ">Itr"+itr_cnt;
+			CommonVariables.ResultSheet.get().put(NewCompleteTCName, CompleteTCName + "," + itr_cnt + "," + TestCaseResult + ","  + CommonVariables.PlatformName.get() + "-" + CommonVariables.DeviceName.get() + "," + MethodDescription);
+			CommonVariables.TestMethodDescriptions.get().put(TestDescriptionKey, MethodDescription);
+			CommonVariables.CurrentTestCaseResult.set(TestCaseResult);		  
+			CommonVariables.TestCasessHighLevelLog.get().add(CommonVariables.CurrentTestCaseName.get() + ":" + TestCaseResult + ":" + DataParameters);
+			CommonVariables.LastMethodName.set(testName);
+			//		  CommonVariables.CurrentTestCaseLog.info("Stopping the test method");
+
+			try {
+				CommonVariables.HighLevelLog.get().write(CommonVariables.CurrentTestClassName.get() + "\t"+CommonVariables.CurrentTestCaseName.get() + "\t"+TestCaseResult+"\t"+DataParameters+"\t"+CommonVariables.TCStartTime.get() + "\t"+CommonVariables.TCEndTime.get()+"\t"+"-"+"\t"+"-"+"\t"+"-"+"\r\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	  }
 
 	  @AfterClass
 	  public void ClassCleanUp()
@@ -254,16 +282,16 @@ public class SAS_Engine {
 		File dir = new File(ReportPath);
 		File[] directoryListing = dir.listFiles();
 		if (directoryListing != null) {
-		  for (File file : directoryListing) {
-			  if(!file.isDirectory()){
-				  if(FilenameUtils.getExtension(file.getPath()).contains("log")){
-/*					  HTMLReporting htmlreporting = new HTMLReporting();
-					  htmlreporting.ConvertLogToHtml(ReportPath, FilenameUtils.removeExtension(file.getName().toString()));			  
-*/				  }
-			  }
+			for (File file : directoryListing) {
+				if(!file.isDirectory()){
+					if(FilenameUtils.getExtension(file.getPath()).contains("log")){
+						HTMLReporting htmlreporting = new HTMLReporting();
+						htmlreporting.ConvertLogToHtml(ReportPath, FilenameUtils.removeExtension(file.getName().toString()));			  
+					}
+				}
 
-		    // Do something with child
-		  }
+				// Do something with child
+			}
 		} else {}
 		
 	  }
@@ -290,9 +318,9 @@ public class SAS_Engine {
 			e.printStackTrace();
 		  }
 		  CommonVariables.ExecutionEndTime.set(GetCurrentTime());
-/*		  HTMLReporting htmlreporting = new HTMLReporting();
+		  HTMLReporting htmlreporting = new HTMLReporting();
 		  boolean flag = htmlreporting.ConvertHighLevelLogToHtml(CommonVariables.RootResultFolderPath.get(), "HighLevelLog");
-*/
+
 		  // code to send Email Report
 		  if (properties.getProperty("EmailReport").toLowerCase().trim().contains("true")){
 			  

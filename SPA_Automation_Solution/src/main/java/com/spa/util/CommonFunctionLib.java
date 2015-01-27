@@ -172,8 +172,8 @@ public class CommonFunctionLib extends DetailedLogs {
 				objCapabilities.setCapability("avdLaunchTimeout", "300000"); //How long to wait in milliseconds for an avd to launch and connect to ADB (default 120000)
 				objCapabilities.setCapability("newCommandTimeout", "18000");
 				objCapabilities.setCapability("session-override", true);
-				objCapabilities.setCapability("device", "@default");
-				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
+//				objCapabilities.setCapability("device", "@default");
+//				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
 //				objCapabilities.setCapability("appPackage", "com.yoolotto.android");
 //				objCapabilities.setCapability("appActivity", "activities.MainActivity");
 //				objCapabilities.setCapability("appWaitActivity", "");
@@ -182,11 +182,15 @@ public class CommonFunctionLib extends DetailedLogs {
 				try {   
 					driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), objCapabilities);
 					//driver = new AndroidDriver(new URL("http://" + properties.getProperty("machineIP") + ":" + properties.getProperty("PortNumber") + "/wd/hub"), objCapabilities);
-
+					Thread.sleep(2000);
 					break;
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					try{
+						driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), objCapabilities);
+					}
+					catch(Exception ex){
+						ex.printStackTrace();
+					}
 					break;
 				} 
 			default:

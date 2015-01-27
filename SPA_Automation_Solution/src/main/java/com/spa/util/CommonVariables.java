@@ -20,6 +20,7 @@ public class CommonVariables {
 	public static ThreadLocal<String> CurrentTestCaseName = new ThreadLocal<String>();
 	public static ThreadLocal<String> CurrentTestClassName = new ThreadLocal<String>();
 	public static ThreadLocal<String> CurrentTestClassResult = new ThreadLocal<String>();
+	public static ThreadLocal<Map<String, String>> TestMethodDescriptions = new ThreadLocal<Map<String, String>>();
 	public static ThreadLocal<Logger> CurrentTestCaseLog = new ThreadLocal<Logger>();
 	public static ThreadLocal<String> CurrentTestCaseResult = new ThreadLocal<String>();
 	public static ThreadLocal<Logger> CurrentTestClassLog = new ThreadLocal<Logger>();
@@ -31,7 +32,7 @@ public class CommonVariables {
 	public static ThreadLocal<String> TCResultFolderPath = new ThreadLocal<String>();
 	public static ThreadLocal<String> CurrentTCLogPath = new ThreadLocal<String>();
 	public static ThreadLocal<Integer> TestCase_Data_Iterator = new ThreadLocal<Integer>();
-	
+	public static ThreadLocal<Map<String, String>> ResultSheet = new ThreadLocal<Map<String, String>>();
 	public static ThreadLocal<ArrayList<String>> ScenariosHighLevelLog = new ThreadLocal<ArrayList<String>>();
 	public static ThreadLocal<ArrayList<String>> TestCasessHighLevelLog = new ThreadLocal<ArrayList<String>>();
 	

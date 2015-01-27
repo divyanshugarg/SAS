@@ -13,14 +13,14 @@ public class homePageValidation extends SAS_Engine {
 	
 	@org.testng.annotations.AfterMethod
 	public void afterClass(){
-		driver.closeApp();	
+	//	driver.closeApp();	
 	}
 	
 	@org.testng.annotations.Test(priority = 1,description ="<write object of Test Case>")
 	public void TestSuccessfullWebLogin(){
 		boolean passflag = true;
 		try{
-
+			objCommonFunc.AddToLog("CurrentTestCaseLog", "info", "successfully logged In");
 		}
 		catch(Exception e2){
 			objCommonFunc.AddToLog("CurrentTestCaseLog", "error", "Error Occurred in testcase: "+e2.getLocalizedMessage());
