@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 
 public class CommonVariables {
-	public static DetailedLogs DL;
+	public static ThreadLocal<DetailedLogs> DL = new ThreadLocal<DetailedLogs>();
 	public static ThreadLocal<AppiumDriver> CommonDriver = new ThreadLocal<AppiumDriver>();
 	public static ThreadLocal<CommonFunctionLib> objComFuncLib = new ThreadLocal<CommonFunctionLib>();
 	public static ThreadLocal<String> CurrentTestCaseName = new ThreadLocal<String>();

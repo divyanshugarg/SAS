@@ -8,12 +8,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,22 +41,31 @@ public class SAS_Engine {
 	CommonFunctionLib objCommonFunc;
 	Properties properties; 
 	DateFormat dateFormat;
+	public static long threadCount = 1;
 	Calendar startTime;
 	Calendar endTime;
 	public int itr_cnt=1;
   Properties prop = new Properties();
   
-	  @BeforeTest
+	  @BeforeTest(alwaysRun = true)
 	  public void beforeSuite(ITestContext context) throws IOException{
 		  CommonVariables.setCommonFunctionLib();
 		  objCommonFunc = CommonVariables.getCommonFunctionLib();
+		  String hostname = InetAddress.getLocalHost().getHostName();
+		  CommonVariables.MachineHostName.set(hostname);
+		  try{Thread.sleep(1000*threadCount);threadCount = threadCount+1;}catch(InterruptedException ex){}
+		  CommonVariables.DL.set(new DetailedLogs());
+		  CommonVariables.ResultSheet.set(new HashMap<String, String>());
+		  CommonVariables.TestMethodDescriptions.set(new HashMap<String, String>());
 		  CommonVariables.CommonDriver.set(null);
 		  CommonVariables.CurrentTestCaseName.set("");
 		  CommonVariables.TotalTCCount.set(new Integer(0));
 		  CommonVariables.PassTCCount.set(new Integer(0));
 		  CommonVariables.FailTCCount.set(new Integer(0));
+		  CommonVariables.SkipTCCount.set(new Integer(0));
 		  CommonVariables.TestCasessHighLevelLog.set(new ArrayList<String>());
 		  CommonVariables.ScenariosHighLevelLog.set(new ArrayList<String>());
+		  CommonVariables.LastMethodName.set("");
 		  CommonVariables.CurrentTestClassResult.set("PASS");
 		  CommonVariables.LastMethodName.set("");
 		  String DeviceName = System.getenv("DeviceName");
@@ -74,7 +85,7 @@ public class SAS_Engine {
 			  CommonVariables.DeviceName.set(prop.getProperty("DeviceType"));
 		  }
 		  System.out.println("Running on Device: "+CommonVariables.DeviceName.get());
-
+		  DeviceType = CommonVariables.DeviceName.get();
 		  if(DeviceEnvironment != null){
 			  CommonVariables.PlatformName.set(DeviceEnvironment);
 		  }
@@ -94,20 +105,19 @@ public class SAS_Engine {
 		  dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		  startTime = Calendar.getInstance();
 		  System.out.println(dateFormat.format(startTime.getTime()));
-		  CommonVariables.DL = new DetailedLogs();
+		  CommonVariables.DL.set(new DetailedLogs());
 
 		  String timestamp = new SimpleDateFormat("yyyy_MM_dd_hh_mm_sss_a").format(new Date());
 		  String Report_Root_Path = System.getProperty("user.dir")+"/logs/Results/" + timestamp;
-		  CommonVariables.DL.CreateFolder(Report_Root_Path);
-
-		  Report_Root_Path = System.getProperty("user.dir")+"/logs/Results/" + timestamp + "/" + DeviceType;
-		  CommonVariables.DL.CreateFolder(Report_Root_Path);
-
+		  CommonVariables.DL.get().CreateFolder(Report_Root_Path);
+		  Report_Root_Path = System.getProperty("user.dir")+"/logs/Results/" + timestamp + "/" + DeviceType + "_" + Thread.currentThread().getId();
+		  CommonVariables.DL.get().CreateFolder(Report_Root_Path);
+	
 		  CommonVariables.RootResultFolderPath.set(Report_Root_Path);
 
 		  //		  System.out.println(DeviceType + " result path: " + CommonVariables.RootResultFolderPath);
 
-		  CommonVariables.CurrentGlobalLog.set(CommonVariables.DL.StartLogs("Global_Log",Report_Root_Path));
+		  CommonVariables.CurrentGlobalLog.set(CommonVariables.DL.get().StartLogs("Global_Log",Report_Root_Path));
 		  CommonVariables.CurrentGlobalLog.get().info("Staring the Suite");	
 		  //		  objCommonFunc.AddToLog("info", "Staring the Suite");
 
@@ -117,30 +127,30 @@ public class SAS_Engine {
 	  }
 
 	  
-	  @BeforeClass
+	  @BeforeClass(alwaysRun = true)
 	  public void beforeClass() throws IOException
 	  {
 		  CommonVariables.CurrentTestClassResult.set("PASS");
 		  objCommonFunc = new CommonFunctionLib(CommonVariables.CommonDriver.get());
-		  CommonVariables.DL = new DetailedLogs();
 		  String completeclassName = this.getClass().getName();//HomePageValidation
 		  
 		  String[] sArr = completeclassName.split("\\.");
 		  int last_array_item_index = sArr.length - 1;
 		  String className = sArr[last_array_item_index];
+		  String classLogName = className + "_" + Thread.currentThread().getId();
 		  CommonVariables.CurrentTestClassName.set(className);		//HomePageValidation
 		  
 		  String Scenario_Report_Folder = CommonVariables.RootResultFolderPath.get() + "/" + className;
-		  CommonVariables.DL.CreateFolder(Scenario_Report_Folder);
+		  CommonVariables.DL.get().CreateFolder(Scenario_Report_Folder);
 		  CommonVariables.ScenarioResultFolderPath.set(Scenario_Report_Folder);
 		  
 		  String TestCases_Report_Folder = CommonVariables.ScenarioResultFolderPath.get() + "/" + "TestCases";
-		  CommonVariables.DL.CreateFolder(TestCases_Report_Folder);
+		  CommonVariables.DL.get().CreateFolder(TestCases_Report_Folder);
 		  
 		  String TestCases_ScreenShot_Folder = CommonVariables.ScenarioResultFolderPath.get() + "/" + "ScreenShots";
-		  CommonVariables.DL.CreateFolder(TestCases_ScreenShot_Folder);
+		  CommonVariables.DL.get().CreateFolder(TestCases_ScreenShot_Folder);
 		  
-		  CommonVariables.CurrentTestClassLog.set(CommonVariables.DL.StartLogs(className,Scenario_Report_Folder));
+		  CommonVariables.CurrentTestClassLog.set(CommonVariables.DL.get().StartLogs(classLogName,Scenario_Report_Folder));
 		  CommonVariables.CurrentTestClassLog.get().info("Staring the class");
 		  CommonVariables.CurrentTestClassLog.get().debug("In Before Class method inside BaseTestCase");	
 		  CommonVariables.CurrentTestCaseResult.set("");
@@ -149,6 +159,8 @@ public class SAS_Engine {
 	  @BeforeMethod
 	  public void beforeTestCase(Method method) throws IOException{
 		  String testName = method.getName(); 							//VerifyHomePgModuleNameandOrder
+			String testClassName = CommonVariables.CurrentTestClassName.get();
+			String testcaseLogName = testClassName + "-" + testName + "_" + Thread.currentThread().getId();
 		  if(CommonVariables.CurrentTestCaseName.get().equals(testName)){
 			  if(CommonVariables.CurrentTestCaseLog.get() != null){	
 				  CommonVariables.TestCase_Data_Iterator.set(CommonVariables.TestCase_Data_Iterator.get() + 1);
@@ -159,7 +171,7 @@ public class SAS_Engine {
 				  CommonVariables.DataProviderIterator.set(1);
 				  CommonVariables.CurrentTestCaseName.set(testName);
 				  CommonVariables.TestCase_Data_Iterator.set(CommonVariables.TestCase_Data_Iterator.get() + 1);
-				  CommonVariables.CurrentTestCaseLog.set(CommonVariables.DL.StartLogs(testName,CommonVariables.ScenarioResultFolderPath.get() + "/" + "TestCases"));
+				  CommonVariables.CurrentTestCaseLog.set(CommonVariables.DL.get().StartLogs(testcaseLogName,CommonVariables.ScenarioResultFolderPath.get() + "/" + "TestCases"));
 //				  objCommonFunc.AddToLog("info", "***************************   Dataprovider Iteration No: " +  CommonVariables.TestCase_Data_Iterator.get() + " :************************************");
 				  CommonVariables.CurrentTestCaseLog.get().info("***************************   Dataprovider Iteration No: " +  CommonVariables.TestCase_Data_Iterator.get() + " :************************************");
 //				  CommonVariables.CurrentTestCaseLog.info("Staring the test method");
@@ -167,14 +179,14 @@ public class SAS_Engine {
 		  }else{
 			  CommonVariables.CurrentTestCaseName.set(testName);
 			  CommonVariables.TestCase_Data_Iterator.set(1);
-			  CommonVariables.CurrentTestCaseLog.set(CommonVariables.DL.StartLogs(testName,CommonVariables.ScenarioResultFolderPath.get() + "/" + "TestCases"));
+			  CommonVariables.CurrentTestCaseLog.set(CommonVariables.DL.get().StartLogs(testcaseLogName,CommonVariables.ScenarioResultFolderPath.get() + "/" + "TestCases"));
 			  CommonVariables.CurrentTestCaseLog.get().info("***************************   Dataprovider Iteration No: " +  CommonVariables.TestCase_Data_Iterator.get() + " :************************************");
 		  }
 		  CommonVariables.TCStartTime.set(GetCurrentTime());
 		  System.out.println("Executng the testcase: " + testName);
 	  }
 	  
-	  @AfterMethod
+	  @AfterMethod(alwaysRun = true)
 	  public void afterTestCase(Method method, ITestResult result){
 			//*** code to get the Method Description ****************************************************************
 			String MethodDescription = "";
@@ -245,6 +257,7 @@ public class SAS_Engine {
 				itr_cnt = 1;
 			}
 			String NewCompleteTCName = CompleteTCName + ">Itr"+itr_cnt;
+			System.out.println(CommonVariables.ResultSheet.get());
 			CommonVariables.ResultSheet.get().put(NewCompleteTCName, CompleteTCName + "," + itr_cnt + "," + TestCaseResult + ","  + CommonVariables.PlatformName.get() + "-" + CommonVariables.DeviceName.get() + "," + MethodDescription);
 			CommonVariables.TestMethodDescriptions.get().put(TestDescriptionKey, MethodDescription);
 			CommonVariables.CurrentTestCaseResult.set(TestCaseResult);		  
@@ -260,7 +273,7 @@ public class SAS_Engine {
 			}
 		}
 
-	  @AfterClass
+	  @AfterClass(alwaysRun = true)
 	  public void ClassCleanUp()
 	  {
 		  CommonVariables.CurrentTestClassLog.get().info("Stopping the class");
@@ -296,7 +309,7 @@ public class SAS_Engine {
 		
 	  }
 
-	  @AfterTest 
+	  @AfterTest (alwaysRun = true)
 	  public void afterTest(){
 		  if(driver != null){
 			  try{

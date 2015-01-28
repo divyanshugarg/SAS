@@ -167,10 +167,10 @@ public class CommonFunctionLib extends DetailedLogs {
 				objCapabilities.setCapability("fullReset", "true");
 				objCapabilities.setCapability("locale", "US");
 				objCapabilities.setCapability("takesScreenshot", true);
-				objCapabilities.setCapability("deviceReadyTimeout", "300");  //Timeout in seconds while waiting for device to become ready
-				objCapabilities.setCapability("androidDeviceReadyTimeout", "300"); //Timeout in seconds used to wait for a device to become ready after booting
+				objCapabilities.setCapability("deviceReadyTimeout", "210");  //Timeout in seconds while waiting for device to become ready
+				objCapabilities.setCapability("androidDeviceReadyTimeout", "420"); //Timeout in seconds used to wait for a device to become ready after booting
 				objCapabilities.setCapability("avdLaunchTimeout", "300000"); //How long to wait in milliseconds for an avd to launch and connect to ADB (default 120000)
-				objCapabilities.setCapability("newCommandTimeout", "18000");
+				objCapabilities.setCapability("newCommandTimeout", "180000");
 				objCapabilities.setCapability("session-override", true);
 //				objCapabilities.setCapability("device", "@default");
 //				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
@@ -182,17 +182,20 @@ public class CommonFunctionLib extends DetailedLogs {
 				try {   
 					driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), objCapabilities);
 					//driver = new AndroidDriver(new URL("http://" + properties.getProperty("machineIP") + ":" + properties.getProperty("PortNumber") + "/wd/hub"), objCapabilities);
-					Thread.sleep(2000);
+					Thread.sleep(4000);
 					break;
-				} catch (Exception e) {
+				}
+				catch(org.openqa.selenium.SessionNotCreatedException ex){
 					try{
 						driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), objCapabilities);
 					}
-					catch(Exception ex){
+					catch(Exception e){
 						ex.printStackTrace();
 					}
-					break;
+				}
+				catch (Exception e) {
 				} 
+				break;
 			default:
 				AddToLog(LogName.CurrentTestCaseLog, "error", "None of the DeviceType Case Matched");
 				AddToLog("CurrentTestClassLog", "error", "None of the DeviceType Case Matched");
@@ -286,7 +289,7 @@ public class CommonFunctionLib extends DetailedLogs {
 		{ 
 			String command = "adb shell getprop ro.build.version.release";
 			Process p=Runtime.getRuntime().exec(command); 
-			Thread.sleep(2000);
+			Thread.sleep(200);
 			BufferedReader error =new BufferedReader(new InputStreamReader(p.getErrorStream()));
 			BufferedReader reader=new BufferedReader(new InputStreamReader(p.getInputStream())); 
 			boolean isAlreadyRunning = false;
