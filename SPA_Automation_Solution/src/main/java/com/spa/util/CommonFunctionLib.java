@@ -885,5 +885,99 @@ public class CommonFunctionLib extends DetailedLogs {
 			
 		}
 	}
+
+	public void SwipeRight(WebElement element){
+		//Executing swipe on in the case of iOS simulators. Skipping it for Android Chrome as this swipe will not yet implemented on it.
+		try{
+				double browser_top_offset = 0.0;
+				if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("mobile")){
+					browser_top_offset = 0;
+				}else if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("tablet")){
+					browser_top_offset = 80;
+				}
+				RemoteWebElement remoteelem = ((RemoteWebElement)element);        	
+				JavascriptExecutor js = (JavascriptExecutor)driver;
+				String script = "return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)";
+				Long pageheight1=(Long)js.executeScript(script);
+				Long pagewidth1=(Long)js.executeScript("return Math.max(document.documentElement.clientWidth, window.innerWidth || 0)");
+				//       		Long pageheight2=(Long)js.executeScript("return window.innerHeight");
+				Point eloc =  remoteelem.getLocation();
+				double yloc = eloc.getY();
+				double xstartloc = eloc.getX();
+				double xendloc = eloc.getX() + remoteelem.getSize().width;
+				double swipe_startxratio = xstartloc/pagewidth1;
+				double swipe_endxratio = xendloc/pagewidth1;
+				double elemheight = remoteelem.getSize().getHeight()/2;
+				double yratio = (yloc + elemheight/2 + browser_top_offset)/pageheight1;       	  	      	
+				if(swipe_startxratio < 0.1){swipe_startxratio = 0.1;}
+				if(swipe_endxratio > 0.9){swipe_endxratio = 0.9;}
+				HashMap<String, Double> swipeObject = new HashMap<String, Double>();
+				swipeObject.put("startX", swipe_endxratio);
+				swipeObject.put("startY", yratio);
+				swipeObject.put("endX", swipe_startxratio);
+				swipeObject.put("endY", yratio);
+				swipeObject.put("duration", 0.8);
+				js.executeScript("mobile: swipe", swipeObject);
+				/**
+				 * Try below code to check, it works or not. And if it works, remove JS execute script logic.
+				 */
+				try{
+				driver.swipe(eloc.getX()+ remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, eloc.getX(), remoteelem.getSize().getHeight()/2, 500);
+				}
+				catch(Exception es){
+				}
+		}
+		catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+	}
+
+	
+	public void SwipeLeft(WebElement element){
+		try{
+			double browser_top_offset = 0.0;
+			if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("mobile")){
+				browser_top_offset = 0;
+			}else if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("tablet")){
+				browser_top_offset = 80;
+			}
+			RemoteWebElement remoteelem = ((RemoteWebElement)element);        	
+			JavascriptExecutor js = (JavascriptExecutor)driver;
+			String script = "return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)";
+			Long pageheight1=(Long)js.executeScript(script);
+			Long pagewidth1=(Long)js.executeScript("return Math.max(document.documentElement.clientWidth, window.innerWidth || 0)");
+			//       		Long pageheight2=(Long)js.executeScript("return window.innerHeight");
+			Point eloc =  remoteelem.getLocation();
+			double yloc = eloc.getY();
+			double xstartloc = eloc.getX();
+			double xendloc = eloc.getX() + remoteelem.getSize().width;
+			double swipe_startxratio = xstartloc/pagewidth1;
+			double swipe_endxratio = xendloc/pagewidth1;
+			double elemheight = remoteelem.getSize().getHeight()/2;
+			double yratio = (yloc + elemheight/2 + browser_top_offset)/pageheight1;       	  	      	
+			if(swipe_startxratio < 0.05){swipe_startxratio = 0.05;}
+			if(swipe_endxratio > .95){swipe_endxratio = 0.95;}
+
+			HashMap<String, Double> swipeObject = new HashMap<String, Double>();
+			swipeObject.put("startX", swipe_startxratio);
+			swipeObject.put("startY", yratio);
+			swipeObject.put("endX", swipe_endxratio);
+			swipeObject.put("endY", yratio);
+			swipeObject.put("duration", 0.8);
+			js.executeScript("mobile: swipe", swipeObject);
+			/**
+			 * Try below code to check, it works or not. And if it works, remove JS execute script logic.
+			 */
+			try{
+			driver.swipe(eloc.getX(), remoteelem.getSize().getHeight()/2, eloc.getX() + remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, 500);
+			}
+			catch(Exception es){
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 }
 
