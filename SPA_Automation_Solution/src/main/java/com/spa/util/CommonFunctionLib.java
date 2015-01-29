@@ -240,19 +240,19 @@ public class CommonFunctionLib extends DetailedLogs {
              executor.setExitValue(1);
              CommandLine command = new CommandLine("appium.exe");
              //command.addArgument("appium", false);
-             command.addArgument("–address", false);
+             command.addArgument("–-address", false);
              command.addArgument("127.0.0.1");
-             command.addArgument("-port", false);
+             command.addArgument("--port", false);
              command.addArgument("4723");
-             command.addArgument("-bootstrap-port", false);
+             command.addArgument("--bootstrap-port", false);
              command.addArgument("4724");
-             command.addArgument("-full-reset", false);
-             command.addArgument("-local-timezone", false);
+             command.addArgument("--full-reset", false);
+             command.addArgument("--local-timezone", false);
              command.addArgument("-avd", false);
              command.addArgument("myAndroidEmulator");
-             command.addArgument("-log", false);
-             command.addArgument("-pre-launch", false);
-             command.addArgument("-session-override", false);
+             command.addArgument("--log", false);
+             command.addArgument("--pre-launch", false);
+             command.addArgument("--session-override", false);
              executor.execute(command, resultHandler);
              Thread.sleep(10000);
 /*			 TASKLIST = "cmd /c appium";
@@ -1077,6 +1077,6 @@ public class CommonFunctionLib extends DetailedLogs {
 			e.printStackTrace();
 		}
 	}
-
+//end of file
 }
 
