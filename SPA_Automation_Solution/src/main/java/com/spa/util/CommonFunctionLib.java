@@ -2,6 +2,9 @@ package com.spa.util;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.SwipeElementDirection;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -517,6 +520,44 @@ public class CommonFunctionLib extends DetailedLogs {
 		return state;
 	}
 
+	public boolean tap(WebElement webElement)
+	{
+		boolean state = false;
+		try
+		{
+			io.appium.java_client.MobileElement elem =  (MobileElement)webElement;
+			elem.tap(1, 2);
+			Thread.sleep(2000);
+		}
+		catch(Exception e)
+		{
+			try {
+				io.appium.java_client.TouchAction tabAction = new TouchAction(driver);
+				tabAction.tap(webElement);
+			} catch (Exception e1) {
+				AddToLog("CurrentTestCaseLog", "info", "Error occurred while tabbing on WebElement.");
+				return false;
+			}
+			AddToLog("CurrentTestCaseLog", "info", "Error occurred while clicking on WebElement: " + e.getClass());
+		}
+		return state;
+	}
+	
+	public boolean press(WebElement webElement)
+	{
+		try
+		{
+			io.appium.java_client.TouchAction tabAction = new TouchAction(driver);
+			tabAction.press(webElement);
+			return true;
+		}
+		catch(Exception e)
+		{
+			AddToLog("CurrentTestCaseLog", "info", "Error occurred while clicking on WebElement: " + e.getClass());
+			return false;
+		}
+	}
+	
 	public String GetElementAttributeValue(WebElement objWebElement, String attribute)
 	{
 		try
@@ -932,7 +973,6 @@ public class CommonFunctionLib extends DetailedLogs {
 		}
 	}
 
-	
 	public void SwipeLeft(WebElement element){
 		try{
 			double browser_top_offset = 0.0;
@@ -969,7 +1009,14 @@ public class CommonFunctionLib extends DetailedLogs {
 			 * Try below code to check, it works or not. And if it works, remove JS execute script logic.
 			 */
 			try{
-			driver.swipe(eloc.getX(), remoteelem.getSize().getHeight()/2, eloc.getX() + remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, 500);
+				driver.swipe(eloc.getX(), remoteelem.getSize().getHeight()/2, eloc.getX() + remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, 500);
+			}
+			catch(Exception es){
+			}
+			
+			try{
+				MobileElement elem = (MobileElement) element;
+				elem.swipe(SwipeElementDirection.LEFT, 200);
 			}
 			catch(Exception es){
 			}
