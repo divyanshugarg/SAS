@@ -152,7 +152,7 @@ public class CommonFunctionLib extends DetailedLogs {
 			switch (browserType.trim())
 			{
 			case "Windows-Android-Simulator":
-				createStartAndroidEmulator();
+//				createStartAndroidEmulator();
 //				startAppium();
 				objCapabilities = new DesiredCapabilities();
 				objCapabilities.setCapability(MobileCapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
@@ -484,6 +484,31 @@ public class CommonFunctionLib extends DetailedLogs {
 		}	
 	}
 
+	public  WebElement FindElement(MobileBy locator ,int timeoutInSeconds )
+	{
+		WebElement webElement = null;
+		WebDriverWait wait;
+		try
+		{
+			if (timeoutInSeconds > 0)
+			{
+				wait = new WebDriverWait(driver,timeoutInSeconds);
+				webElement = wait.until(
+						ExpectedConditions.visibilityOfElementLocated(locator));                     	
+				webElement = driver.findElement(locator);
+			}
+			else{
+				webElement = driver.findElement(locator);
+			}
+			return webElement;
+		}
+		catch(Exception e){
+			AddToLog("CurrentTestCaseLog", "error", "Failed to find element: '" + locator.toString() + "'. Error Type: "+e.getClass());
+			return null;
+		}	
+	}
+
+	
 	public boolean SendKeys(WebElement webElement, String value){
 		boolean state = false;
 		try{
@@ -584,11 +609,11 @@ public class CommonFunctionLib extends DetailedLogs {
 	}
 
 
-	public boolean IsElementVisible(final By by) {
+	public boolean IsElementVisible(final MobileBy locator) {			//change selenium By to MobileBy : kapil soni
 		try{
 			wait = new WebDriverWait(driver, 10);
-			wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-			if((driver.findElement(by).getSize().height==0) && (driver.findElement(by).getSize().width==0)){
+			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+			if((driver.findElement(locator).getSize().height==0) && (driver.findElement(locator).getSize().width==0)){
 				return false;
 			}else{
 				return true;
@@ -797,6 +822,7 @@ public class CommonFunctionLib extends DetailedLogs {
 	}
 
 	public List<WebElement> FindElements(MobileLocator LocatorType, String LocatorString ,int timeoutInSeconds )
+
 	{
 		List<WebElement> webElement;
 		WebDriverWait wait;
@@ -857,7 +883,33 @@ public class CommonFunctionLib extends DetailedLogs {
 			return null;
 		}	
 	}
-
+	/**
+	 * Created by Kapil: Findlements with 2 argument (mobileby and timoout)
+	 * @param  
+	 */
+	public  List<WebElement> FindElements(MobileBy locator ,int timeoutInSeconds )
+	{
+		List<WebElement> webElement = null;
+		WebDriverWait wait;
+		try
+		{
+			if (timeoutInSeconds > 0)
+			{
+				wait = new WebDriverWait(driver,timeoutInSeconds);
+				webElement = wait.until(
+						ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));                     	
+				webElement = driver.findElements(locator);
+			}
+			else{
+				webElement = driver.findElements(locator);
+			}
+			return webElement;
+		}
+		catch(Exception e){
+			AddToLog("CurrentTestCaseLog", "error", "Failed to find element: '" + locator.toString() + "'. Error Type: "+e.getClass());
+			return null;
+		}	
+	}
 	/**
 	 * Remove app, if already installed. 
 	 * @param appName App Name. E.g. com.equinox.lotto 
