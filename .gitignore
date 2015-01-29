@@ -1,3 +1,5 @@
 SPA_Automation_Solution/test-output/
 SPA_Automation_Solution/target/
 SPA_Automation_Solution/logs/
+SPA_Automation_Solution/target/classes/
+SPA_Automation_Solution/target/test-classes/
