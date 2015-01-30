@@ -1,7 +1,13 @@
 package com.spa.pages;
 
 
+import io.appium.java_client.MobileBy;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
 import com.spa.objectrepository.HomeScreen_OR;
+import com.spa.util.MobileLocator;
 /**
  * 
  * @author Kapil
@@ -9,9 +15,12 @@ import com.spa.objectrepository.HomeScreen_OR;
  */
 public class HomeScreen extends BasePage {
 	public boolean passflag;
+	public WebElement welcomeScreenElem = null;
 	
 	public HomeScreen(){
-		if(objComFuncLib.FindElement(HomeScreen_OR.jackpot,5)==null){
+		welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
+		objComFuncLib.SwipeLeft(welcomeScreenElem);
+		if(objComFuncLib.FindElement(HomeScreen_OR.jackpot,0)==null){
 			throw new IllegalStateException("This is not the Home screen.");
 		}
 	}

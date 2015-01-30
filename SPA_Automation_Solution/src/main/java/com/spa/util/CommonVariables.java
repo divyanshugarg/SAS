@@ -62,6 +62,7 @@ public class CommonVariables {
 	public static String testNGGroupNames = "";
 	
 	public static void setCommonFunctionLib(){
+		if(getCommonFunctionLib()==null)
 		objComFuncLib.set(new CommonFunctionLib(CommonDriver.get()));
 	}
 

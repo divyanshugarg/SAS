@@ -49,8 +49,6 @@ public class SAS_Engine {
   
 	  @BeforeTest(alwaysRun = true)
 	  public void beforeSuite(ITestContext context) throws IOException{
-		  CommonVariables.setCommonFunctionLib();
-		  objCommonFunc = CommonVariables.getCommonFunctionLib();
 		  String hostname = InetAddress.getLocalHost().getHostName();
 		  CommonVariables.MachineHostName.set(hostname);
 		  try{Thread.sleep(1000*threadCount);threadCount = threadCount+1;}catch(InterruptedException ex){}
@@ -154,6 +152,9 @@ public class SAS_Engine {
 		  CommonVariables.CurrentTestClassLog.get().info("Staring the class");
 		  CommonVariables.CurrentTestClassLog.get().debug("In Before Class method inside BaseTestCase");	
 		  CommonVariables.CurrentTestCaseResult.set("");
+		  CommonVariables.setCommonFunctionLib();
+		  objCommonFunc = CommonVariables.getCommonFunctionLib();
+		  CommonVariables.CommonDriver.set(null);
 	  }
 	  
 	  @BeforeMethod
