@@ -83,6 +83,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -157,24 +158,24 @@ public class CommonFunctionLib extends DetailedLogs {
 			{
 			case "Windows-Android-Simulator":
 //				createStartAndroidEmulator();
-//				startAppium();
+				startAppium();
 				objCapabilities = new DesiredCapabilities();
-				objCapabilities.setCapability(MobileCapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
+//				objCapabilities.setCapability(MobileCapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
 			    objCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
 			    objCapabilities.setCapability("app",path);
 			    objCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");  //Android Emulator
 			   // objCapabilities.setCapability("automationName", "Appium");
 				objCapabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "android");
-				objCapabilities.setCapability("session-override", true);
+//				objCapabilities.setCapability("session-override", true);
 				objCapabilities.setCapability("autoLaunch", true);
 				objCapabilities.setCapability("language", "en");
 				objCapabilities.setCapability("fullReset", "true");
 				objCapabilities.setCapability("locale", "US");
 				objCapabilities.setCapability("takesScreenshot", true);
-				objCapabilities.setCapability("deviceReadyTimeout", "210");  //Timeout in seconds while waiting for device to become ready
+				objCapabilities.setCapability("deviceReadyTimeout", "300");  //Timeout in seconds while waiting for device to become ready
 				objCapabilities.setCapability("androidDeviceReadyTimeout", "420"); //Timeout in seconds used to wait for a device to become ready after booting
 				objCapabilities.setCapability("avdLaunchTimeout", "300000"); //How long to wait in milliseconds for an avd to launch and connect to ADB (default 120000)
-				objCapabilities.setCapability("newCommandTimeout", "180000");
+				objCapabilities.setCapability("newCommandTimeout", "600000");
 				objCapabilities.setCapability("session-override", true);
 //				objCapabilities.setCapability("device", "@default");
 //				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
@@ -184,20 +185,39 @@ public class CommonFunctionLib extends DetailedLogs {
 //				objCapabilities.setCapability("appWaitPackage", "com.mobli");
 //				objCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 				try {   
-					driver = new AndroidDriver(new URL("http://172.16.2.102:4724/wd/hub"), objCapabilities);
+					driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
 					//driver = new AndroidDriver(new URL("http://" + properties.getProperty("machineIP") + ":" + properties.getProperty("PortNumber") + "/wd/hub"), objCapabilities);
-					Thread.sleep(4000);
+					Thread.sleep(4500);
 					break;
 				}
 				catch(org.openqa.selenium.SessionNotCreatedException ex){
 					try{
-						driver = new AndroidDriver(new URL("http://172.16.2.102:4724/wd/hub"), objCapabilities);
+						Thread.sleep(3000);
+						driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
+						Thread.sleep(4000);
 					}
 					catch(Exception e){
-						ex.printStackTrace();
+						e.printStackTrace();
+					}
+				}
+				catch(UnreachableBrowserException e3){
+					try{
+						Thread.sleep(2000);
+						driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
+						Thread.sleep(4000);
+					}
+					catch(Exception e){
+						e.printStackTrace();
 					}
 				}
 				catch (Exception e) {
+					e.printStackTrace();
+					try{
+						driver = new AndroidDriver(new URL("http://172.20.38.57:4724/wd/hub"), objCapabilities);
+					}
+					catch(Exception ex){
+						ex.printStackTrace();
+					}
 				} 
 				break;
 			default:
@@ -239,10 +259,10 @@ public class CommonFunctionLib extends DetailedLogs {
              DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
              DefaultExecutor executor = new DefaultExecutor();
              executor.setExitValue(1);
-             CommandLine command = new CommandLine("appium.exe");
+             CommandLine command = new CommandLine("/c appium.exe");
              //command.addArgument("appium", false);
              command.addArgument("–-address", false);
-             command.addArgument("127.0.0.1");
+             command.addArgument("192.168.1.6");
              command.addArgument("--port", false);
              command.addArgument("4723");
              command.addArgument("--bootstrap-port", false);
@@ -420,6 +440,34 @@ public class CommonFunctionLib extends DetailedLogs {
 
 	}
 
+	public void closeApp()
+	{
+		if (driver!=null) {
+			try
+			{
+				driver.closeApp();
+				try {Thread.sleep(2500);} catch (InterruptedException e1) {}
+			}
+			catch(WebDriverException e){
+				try {Thread.sleep(2500);} catch (InterruptedException e1) {}	
+			}
+		}
+	}
+	
+	public void launchApp()
+	{
+		if (driver!=null) {
+			try
+			{
+				driver.launchApp();
+				try {Thread.sleep(4000);} catch (InterruptedException e1) {}
+			}
+			catch(WebDriverException e){
+				try {Thread.sleep(2500);} catch (InterruptedException e1) {}	
+			}
+		}
+	}
+
 	public  WebElement FindElement(MobileLocator LocatorType, String LocatorString ,int timeoutInSeconds )
 	{
 //		LocatorString = "android:id/content";
@@ -440,16 +488,6 @@ public class CommonFunctionLib extends DetailedLogs {
 					webElement = driver.findElement(MobileBy.AccessibilityId(LocatorString));
 				}
 				break;
-			case ByXPath:
-				if (timeoutInSeconds > 0)
-				{
-					wait = new WebDriverWait(driver,timeoutInSeconds);
-					webElement = wait.until(
-							ExpectedConditions.presenceOfElementLocated(MobileBy.xpath(LocatorString)));  
-				}else{
-					webElement = driver.findElement(MobileBy.xpath(LocatorString));
-				}
-				break;
 			case ByClassName:
 				if (timeoutInSeconds > 0)
 				{
@@ -460,16 +498,6 @@ public class CommonFunctionLib extends DetailedLogs {
 					//		ExpectedConditions.visibilityOfElementLocated(MobileBy.className(LocatorString)));  
 				}else{
 					webElement = driver.findElement(MobileBy.className(LocatorString));
-				}
-				break;
-			case ById:
-				if (timeoutInSeconds > 0)
-				{
-					wait = new WebDriverWait(driver,timeoutInSeconds);
-					webElement = wait.until(
-							ExpectedConditions.presenceOfElementLocated(MobileBy.id(LocatorString)));  
-				}else{
-					webElement = driver.findElement(By.id(LocatorString));
 				}
 				break;
 			case ByIosUIAutomation: //a string corresponding to a recursive element search using the UIAutomation library (iOS-only)
@@ -503,7 +531,7 @@ public class CommonFunctionLib extends DetailedLogs {
 		}	
 	}
 
-	public  WebElement FindElement(MobileBy locator ,int timeoutInSeconds )
+	public  WebElement FindElement(By locator ,int timeoutInSeconds )
 	{
 		WebElement webElement = null;
 		WebDriverWait wait;
@@ -527,7 +555,6 @@ public class CommonFunctionLib extends DetailedLogs {
 		}	
 	}
 
-	
 	public boolean SendKeys(WebElement webElement, String value){
 		boolean state = false;
 		try{
@@ -665,10 +692,9 @@ public class CommonFunctionLib extends DetailedLogs {
 		return flag;
 	}
 
-
-	public boolean IsElementVisible(final MobileBy locator) {			//change selenium By to MobileBy : kapil soni
+	public boolean IsElementVisible(final By locator) {
 		try{
-			wait = new WebDriverWait(driver, 10);
+			wait = new WebDriverWait(driver, 2);
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			if((driver.findElement(locator).getSize().height==0) && (driver.findElement(locator).getSize().width==0)){
 				return false;
@@ -856,7 +882,7 @@ public class CommonFunctionLib extends DetailedLogs {
 		try{
 			Set<String> contextNames = driver.getContextHandles();
 			for (String contextName : contextNames) {
-				System.out.println(contextNames); //prints out something like NATIVE_APP \n WEBVIEW_1
+				System.out.println(contextName); //prints out something like NATIVE_APP \n WEBVIEW_1
 			}
 			driver.context((String) contextNames.toArray()[1]); // set context to WEBVIEW_1
 			this.driver = driver;
@@ -898,16 +924,6 @@ public class CommonFunctionLib extends DetailedLogs {
 					webElement = driver.findElements(MobileBy.AccessibilityId(LocatorString));
 				}
 				break;
-			case ByXPath:
-				if (timeoutInSeconds > 0)
-				{
-					wait = new WebDriverWait(driver,timeoutInSeconds);
-					webElement = driver.findElements(MobileBy.xpath(LocatorString));
-
-				}else{
-					webElement = driver.findElements(MobileBy.xpath(LocatorString));
-				}
-				break;
 			case ByClassName:
 				if (timeoutInSeconds > 0)
 				{
@@ -940,11 +956,12 @@ public class CommonFunctionLib extends DetailedLogs {
 			return null;
 		}	
 	}
+
 	/**
-	 * Created by Kapil: Findlements with 2 argument (mobileby and timoout)
+	 * Created by Kapil: Findelments with 2 argument (By and timoout)
 	 * @param  
 	 */
-	public  List<WebElement> FindElements(MobileBy locator ,int timeoutInSeconds )
+	public  List<WebElement> FindElements(By locator ,int timeoutInSeconds )
 	{
 		List<WebElement> webElement = null;
 		WebDriverWait wait;
@@ -995,134 +1012,105 @@ public class CommonFunctionLib extends DetailedLogs {
 		}
 	}
 
+	public void SwipeRight() {
+		SwipeRight(null);
+		
+	}
+	
 	public void SwipeRight(WebElement element){
-		//Executing swipe on in the case of iOS simulators. Skipping it for Android Chrome as this swipe will not yet implemented on it.
+		Point eloc =  null;
+		MobileElement mobileElem = null;
+		int xStartIndex = 0;
+		int xEndIndex = 0;
+		int yIndex = 0;
 		try{
-				double browser_top_offset = 0.0;
-				if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("mobile")){
-					browser_top_offset = 0;
-				}else if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("tablet")){
-					browser_top_offset = 80;
-				}
-				RemoteWebElement remoteelem = ((RemoteWebElement)element);        	
-				JavascriptExecutor js = (JavascriptExecutor)driver;
-				String script = "return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)";
-				Long pageheight1=(Long)js.executeScript(script);
-				Long pagewidth1=(Long)js.executeScript("return Math.max(document.documentElement.clientWidth, window.innerWidth || 0)");
-				//       		Long pageheight2=(Long)js.executeScript("return window.innerHeight");
-				Point eloc =  remoteelem.getLocation();
-				double yloc = eloc.getY();
-				double xstartloc = eloc.getX();
-				double xendloc = eloc.getX() + remoteelem.getSize().width;
-				double swipe_startxratio = xstartloc/pagewidth1;
-				double swipe_endxratio = xendloc/pagewidth1;
-				double elemheight = remoteelem.getSize().getHeight()/2;
-				double yratio = (yloc + elemheight/2 + browser_top_offset)/pageheight1;       	  	      	
-				if(swipe_startxratio < 0.1){swipe_startxratio = 0.1;}
-				if(swipe_endxratio > 0.9){swipe_endxratio = 0.9;}
-				HashMap<String, Double> swipeObject = new HashMap<String, Double>();
-				swipeObject.put("startX", swipe_endxratio);
-				swipeObject.put("startY", yratio);
-				swipeObject.put("endX", swipe_startxratio);
-				swipeObject.put("endY", yratio);
-				swipeObject.put("duration", 0.8);
-				js.executeScript("mobile: swipe", swipeObject);
-				/**
-				 * Try below code to check, it works or not. And if it works, remove JS execute script logic.
-				 */
-				try{
-				driver.swipe(eloc.getX()+ remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, eloc.getX(), remoteelem.getSize().getHeight()/2, 500);
-				}
-				catch(Exception es){
-				}
+			if(element!=null){
+				mobileElem = (MobileElement)element;
+				eloc = mobileElem.getLocation();
+				xStartIndex =  eloc.getX();
+				xStartIndex = (int) xStartIndex + 20;
+				xEndIndex = eloc.getX() + mobileElem.getSize().width;
+				xEndIndex  = (int)(eloc.getX() + mobileElem.getSize().width) - (eloc.getX() + mobileElem.getSize().width)/10;
+				yIndex = eloc.getY()+ mobileElem.getSize().getHeight()/2;
+			}
+			else{
+				Dimension screenSize = driver.manage().window().getSize();
+				xEndIndex = 20;
+				yIndex = screenSize.getHeight()/2;
+				xStartIndex = screenSize.getWidth() - 20;
+			}
+			driver.swipe(xEndIndex, yIndex, xStartIndex, yIndex, 500);
 		}
-		catch(Exception e){
-			System.out.println(e.getMessage());
+		catch(Exception e1){
+			try{
+				MobileElement elem = (MobileElement) element;
+				elem.swipe(SwipeElementDirection.RIGHT, 200);
+			}
+			catch(Exception e3){
+				e3.printStackTrace();
+			}
 		}
 	}
 
 	public void SwipeLeft(WebElement element){
 		Point eloc =  null;
-		RemoteWebElement remoteelem = null;
+		MobileElement mobileElem = null;
+		int xStartIndex = 0;
+		int xEndIndex = 0;
+		int yIndex = 0;
 		try{
-			double browser_top_offset = 0.0;
-			if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("mobile")){
-				browser_top_offset = 0;
-			}else if(GetDriverInfo().get("DriverType").trim().equalsIgnoreCase("tablet")){
-				browser_top_offset = 80;
+			if(element!=null){
+				mobileElem = (MobileElement)element;
+				eloc = mobileElem.getLocation();
+				xStartIndex =  eloc.getX();
+				xStartIndex = xStartIndex + 20;
+				xEndIndex = eloc.getX() + mobileElem.getSize().width;
+				xEndIndex  = (int)(eloc.getX() + mobileElem.getSize().width) - (eloc.getX() + mobileElem.getSize().width)/10;
+				yIndex = eloc.getY()+ mobileElem.getSize().getHeight()/2;
 			}
-			remoteelem = ((RemoteWebElement)element);    
-			eloc =  remoteelem.getLocation();
-			JavascriptExecutor js = (JavascriptExecutor)driver;
-	//		String script = "return Math.max(document.documentElement.clientHeight, window.innerHeight || 0)";
-		//	Long pageheight1=(Long)js.executeScript(script);
-			//Long pagewidth1=(Long)js.executeScript("return Math.max(document.documentElement.clientWidth, window.innerWidth || 0)");
-			//       		Long pageheight2=(Long)js.executeScript("return window.innerHeight");
-
-			double yloc = eloc.getY();
-			double xstartloc = eloc.getX();
-			Dimension screenSize = driver.manage().window().getSize();
-			Long pagewidth1 = (long) screenSize.width;
-			Long pageheight1 = (long) screenSize.height;
-			double xendloc = eloc.getX() + remoteelem.getSize().width;
-			double swipe_startxratio = xstartloc/pagewidth1;
-			double swipe_endxratio = xendloc/pagewidth1;
-			double elemheight = remoteelem.getSize().getHeight()/2;
-			double yratio = (yloc + elemheight/2 + browser_top_offset)/pageheight1;       	  	      	
-			if(swipe_startxratio < 0.05){swipe_startxratio = 0.05;}
-			if(swipe_endxratio > .95){swipe_endxratio = 0.95;}
-
-			HashMap<String, Double> swipeObject = new HashMap<String, Double>();
-			swipeObject.put("startX", swipe_startxratio);
-			swipeObject.put("startY", yratio);
-			swipeObject.put("endX", swipe_endxratio);
-			swipeObject.put("endY", yratio);
-			swipeObject.put("duration", 0.8);
-//			js.executeScript("mobile: swipe", swipeObject);
-
-			/**
-			 * Try below code to check, it works or not. And if it works, remove JS execute script logic.
-			 */
-
-			try{
-				driver.swipe(150, 500, 1000, 500, 500);
-				driver.swipe(150, 500, 1000, 500, 500);
-				driver.swipe(150, 500, 1000, 500, 500);
-				driver.swipe(150, 500, 1000, 500, 500);
-				driver.swipe(eloc.getX()+100, remoteelem.getSize().getHeight()/2, eloc.getX() + remoteelem.getSize().width-100, remoteelem.getSize().getHeight()/2, 500);
+			else{
+				Dimension screenSize = driver.manage().window().getSize();
+				xEndIndex = 20;
+				yIndex = screenSize.getHeight()/2;
+				xStartIndex = screenSize.getWidth() - 20;
 			}
-			catch(Exception e2){
-				try{
-					MobileElement elem = (MobileElement) element;
-					elem.swipe(SwipeElementDirection.LEFT, 200);
-					elem.swipe(SwipeElementDirection.RIGHT, 200);
-					elem.swipe(SwipeElementDirection.LEFT, 200);
-				}
-				catch(Exception e3){
-					e3.printStackTrace();
-				}
-			}
-
-		
+			driver.swipe(xStartIndex, yIndex, xEndIndex, yIndex, 500);
 		}
 		catch(Exception e1){
 			try{
-				driver.swipe(eloc.getX(), remoteelem.getSize().getHeight()/2, eloc.getX() + remoteelem.getSize().width, remoteelem.getSize().getHeight()/2, 500);
+				MobileElement elem = (MobileElement) element;
+				elem.swipe(SwipeElementDirection.LEFT, 200);
 			}
-			catch(Exception e2){
-				try{
-					MobileElement elem = (MobileElement) element;
-					elem.swipe(SwipeElementDirection.LEFT, 200);
-					elem.swipe(SwipeElementDirection.RIGHT, 200);
-					elem.swipe(SwipeElementDirection.LEFT, 200);
-				}
-				catch(Exception e3){
-					e3.printStackTrace();
-				}
+			catch(Exception e3){
+				e3.printStackTrace();
 			}
-
 		}
 	}
-//end of file
+	/**
+	 * 
+	 */
+	public void SwipeLeft() {
+		SwipeLeft(null);
+		
+	}
+	
+	/**
+	 * 
+	 * @param welcomeScreenElem
+	 * @param waitTime
+	 */
+	public void waitforElementVisible(By welcomeScreenElem, int waitTime) {
+		wait = new WebDriverWait(driver, waitTime);
+		try{
+			wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeScreenElem));
+		}
+		catch(TimeoutException e){
+			if(CommonVariables.CurrentTestCaseLog.get() != null){
+				AddToLog(LogName.CurrentTestCaseLog, "info", "Caught 'TimeoutException' exception while wait for element ( "+welcomeScreenElem.toString()+" ) visibility."); }
+			else{
+				AddToLog(LogName.CurrentTestClassLog, "info","Caught 'TimeoutException' exception while wait for element ( "+welcomeScreenElem.toString()+" ) visibility.");
+			}
+		}
+	}
 }
 

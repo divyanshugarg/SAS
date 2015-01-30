@@ -1,13 +1,15 @@
 package com.spa.objectrepository;
+
+import org.openqa.selenium.By;
 /**
  * 
  * @author Kapil
  *
  */
-import io.appium.java_client.MobileBy;
+
 public class StateChange_OR {
-	public static MobileBy ChangeStateButton = (MobileBy) MobileBy.name("CHANGE STATE"); 
-	public static MobileBy ConfirmButton = (MobileBy) MobileBy.name("CONFIRM");
-	public static MobileBy StateDropDown = (MobileBy) MobileBy.id("android:id/text1");
+	public static By ChangeStateButton = By.name("CHANGE STATE"); 
+	public static By ConfirmButton = By.name("CONFIRM");
+	public static By StateDropDown = By.id("android:id/text1");
 
 }

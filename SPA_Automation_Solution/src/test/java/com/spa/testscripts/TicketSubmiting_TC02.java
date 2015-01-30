@@ -16,11 +16,11 @@ public class TicketSubmiting_TC02 extends SAS_Engine{
   @Test
   public void TicketSubmission() 
   {
-	  objHomeScreen.SwipeRight();
+	  objCommonFunc.SwipeRight();
 	  //OK,GotIt
 	  objHomeScreen.HomePagePopUp();
 	  TicketScan Ticketscan = objHomeScreen.camera();
-	  objHomeScreen.SwipeRight();
+	  objCommonFunc.SwipeRight();
 	  //GotIt Scan Intro need to be added
 	  Ticketscan.stateselectionclick();
 	  Ticketscan.Gameelectionclick();

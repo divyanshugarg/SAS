@@ -1,7 +1,7 @@
 package com.spa.objectrepository;
 
-import io.appium.java_client.MobileBy;
+import org.openqa.selenium.By;
 
 public class TicketSubmissionConfirmation_OR {
-	public static MobileBy ConfirmGotIt = (MobileBy) MobileBy.name("GOT IT");
+	public static By ConfirmGotIt = By.name("GOT IT");
 }

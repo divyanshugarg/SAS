@@ -2,6 +2,7 @@
  * 
  */
 /**
+ * @description: Having all the objects locator on different screens/pages.
  * @author divyanshu.garg
  *
  */

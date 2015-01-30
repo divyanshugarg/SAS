@@ -1,11 +1,8 @@
 package com.spa.pages;
 
-
 import io.appium.java_client.MobileBy;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-
 import com.spa.objectrepository.HomeScreen_OR;
 import com.spa.util.MobileLocator;
 /**
@@ -15,11 +12,23 @@ import com.spa.util.MobileLocator;
  */
 public class HomeScreen extends BasePage {
 	public boolean passflag;
-	public WebElement welcomeScreenElem = null;
+	int i=0;
 	
 	public HomeScreen(){
-		welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
-		objComFuncLib.SwipeLeft(welcomeScreenElem);
+		objComFuncLib.waitforElementVisible(HomeScreen_OR.welcomeScreenElem,4);
+		while(i<=6){
+			//welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
+			objComFuncLib.SwipeLeft();
+			if (objComFuncLib.IsElementVisible(By.className("android.widget.Button")))
+			{
+				objComFuncLib.WebDriverClick(objComFuncLib.FindElement(By.className("android.widget.Button"), 10));
+				objComFuncLib.waitforElementVisible(HomeScreen_OR.jackpot,4);
+				break;
+			}
+			else{
+				i++;
+			}
+		}
 		if(objComFuncLib.FindElement(HomeScreen_OR.jackpot,0)==null){
 			throw new IllegalStateException("This is not the Home screen.");
 		}
@@ -138,21 +147,5 @@ public class HomeScreen extends BasePage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	public void Scrollupwards()
-	{
-		objComFuncLib.ScrollToTop();
-	}
-	public void ScrollDownwards()
-	{
-		objComFuncLib.ScrollToBottom();
-	}
-	public void SwipeLeft()
-	{
-		//objComFuncLib.SwipeLeft(element);
-	}
-	public void SwipeRight()
-	{
-		//objComFuncLib.SwipeRight(element);
 	}
 }

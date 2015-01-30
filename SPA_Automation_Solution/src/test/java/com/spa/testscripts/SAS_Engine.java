@@ -39,16 +39,17 @@ import com.spa.util.HTMLReporting;
 public class SAS_Engine {
 	AppiumDriver driver;
 	CommonFunctionLib objCommonFunc;
-	Properties properties; 
+	//Properties properties; 
 	DateFormat dateFormat;
 	public static long threadCount = 1;
 	Calendar startTime;
 	Calendar endTime;
 	public int itr_cnt=1;
-  Properties prop = new Properties();
+	Properties prop;
   
 	  @BeforeTest(alwaysRun = true)
 	  public void beforeSuite(ITestContext context) throws IOException{
+		  prop = new Properties();
 		  String hostname = InetAddress.getLocalHost().getHostName();
 		  CommonVariables.MachineHostName.set(hostname);
 		  try{Thread.sleep(1000*threadCount);threadCount = threadCount+1;}catch(InterruptedException ex){}
@@ -157,7 +158,7 @@ public class SAS_Engine {
 		  CommonVariables.CommonDriver.set(null);
 	  }
 	  
-	  @BeforeMethod
+	  @BeforeMethod(alwaysRun = true)
 	  public void beforeTestCase(Method method) throws IOException{
 		  String testName = method.getName(); 							//VerifyHomePgModuleNameandOrder
 			String testClassName = CommonVariables.CurrentTestClassName.get();
@@ -286,7 +287,7 @@ public class SAS_Engine {
 		  
 //		  DetailedLogs.APP_LOGS.debug("In After Class");	
 		  try
-		  {Thread.sleep(5000);
+		  {Thread.sleep(1000);
 		  }catch(InterruptedException e){}
 		objCommonFunc.ShutDownDriver();
 		System.out.println(CommonVariables.TestCasessHighLevelLog.get().toString());
@@ -336,7 +337,7 @@ public class SAS_Engine {
 		  boolean flag = htmlreporting.ConvertHighLevelLogToHtml(CommonVariables.RootResultFolderPath.get(), "HighLevelLog");
 
 		  // code to send Email Report
-		  if (properties.getProperty("EmailReport").toLowerCase().trim().contains("true")){
+		  if (prop.getProperty("EmailReport").toLowerCase().trim().contains("true")){
 			  
 		  }
 	  }

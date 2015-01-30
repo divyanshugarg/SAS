@@ -1,15 +1,17 @@
 package com.spa.objectrepository;
+
+import org.openqa.selenium.By;
+
 /**
  * 
  * @author Kapil
  *
  */
-import io.appium.java_client.MobileBy;
 
 
 public class TicketConfirmation_OR {
-	public static MobileBy ScanAgain = (MobileBy) MobileBy.id("com.yoolotto.android:id/use_not_sure");
-	public static MobileBy ScanGot = (MobileBy) MobileBy.name("GOT IT");
-	public static MobileBy ScanTicket = (MobileBy) MobileBy.id("com.yoolotto.android:id/use_image_button");
+	public static By ScanAgain = By.id("com.yoolotto.android:id/use_not_sure");
+	public static By ScanGot = By.name("GOT IT");
+	public static By ScanTicket = By.id("com.yoolotto.android:id/use_image_button");
 
 }

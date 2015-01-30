@@ -1,10 +1,10 @@
 package com.spa.objectrepository;
 
-import io.appium.java_client.MobileBy;
+import org.openqa.selenium.By;
 
 public class EmailFeed_OR {
 	
-	public static MobileBy EmailTextbox = (MobileBy) MobileBy.id("com.yoolotto.android:id/email_text");
-	public static MobileBy SubmitButton = (MobileBy) MobileBy.id("com.yoolotto.android:id/submit_button");
-	public static MobileBy NoThanksButton = (MobileBy) MobileBy.id("com.yoolotto.android:id/no_button");
+	public static By EmailTextbox = By.id("com.yoolotto.android:id/email_text");
+	public static By SubmitButton = By.id("com.yoolotto.android:id/submit_button");
+	public static By NoThanksButton = By.id("com.yoolotto.android:id/no_button");
 }
