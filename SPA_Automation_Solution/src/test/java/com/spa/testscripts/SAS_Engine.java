@@ -95,7 +95,13 @@ public class SAS_Engine {
 			  CommonVariables.PlatformName.set(prop.getProperty("Platform"));
 		  }
 		  System.out.println("Running on Platform: "+CommonVariables.PlatformName.get());
-
+		  if( context.getCurrentXmlTest().getParameter("SeleniumGrid")!=null){
+			  CommonVariables.IsGridExecution.set(context.getCurrentXmlTest().getParameter("SeleniumGrid").trim().equalsIgnoreCase("true"));
+		  }
+		  else{
+			  CommonVariables.IsGridExecution.set(prop.getProperty("SeleniumGrid").trim().equalsIgnoreCase("true"));
+		  }
+		  System.out.println("Running on Grid: "+CommonVariables.IsGridExecution.get());
 		  if(DeviceEnvironment == null){
 			  CommonVariables.PlatformName.set(prop.getProperty("Platform"));
 		  }else{

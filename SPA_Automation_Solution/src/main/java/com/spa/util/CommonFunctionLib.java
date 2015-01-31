@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -86,6 +87,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 /**
  * @author Divyanshu Garg
@@ -100,6 +102,7 @@ public class CommonFunctionLib extends DetailedLogs {
 	WebDriverWait wait;
 	Properties properties; 
 	DesiredCapabilities objCapabilities;
+	File appAbsolutePath = null;
 	/**
 	 * These objects are made non-static. The objects of this class are re-created at some point of time.
 	 */
@@ -148,7 +151,7 @@ public class CommonFunctionLib extends DetailedLogs {
 		{
 			iOSAppPath = properties.getProperty("AppName");
 			File appDir = new File(System.getProperty("user.dir")+ "\\aut");
-			File path = new File(appDir,iOSAppPath.trim());
+			appAbsolutePath = new File(appDir,iOSAppPath.trim());
 			ShutDownDriver();
 			/**  
 			 * Refer the below link to know about different capabilities of Appium server.
@@ -158,18 +161,19 @@ public class CommonFunctionLib extends DetailedLogs {
 			{
 			case "Windows-Android-Simulator":
 //				createStartAndroidEmulator();
-				startAppium();
+//				startAppium();
 				objCapabilities = new DesiredCapabilities();
 //				objCapabilities.setCapability(MobileCapabilityType.VERSION, properties.getProperty("AndroidVersion")); //18
 			    objCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-			    objCapabilities.setCapability("app",path);
+			    objCapabilities.setCapability("app",appAbsolutePath);
 			    objCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");  //Android Emulator
 			   // objCapabilities.setCapability("automationName", "Appium");
 				objCapabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "android");
 //				objCapabilities.setCapability("session-override", true);
 				objCapabilities.setCapability("autoLaunch", true);
 				objCapabilities.setCapability("language", "en");
-				objCapabilities.setCapability("fullReset", "true");
+//				objCapabilities.setCapability("fullReset", "true");  // for iOS only
+				objCapabilities.setCapability("noReset", "false"); 
 				objCapabilities.setCapability("locale", "US");
 				objCapabilities.setCapability("takesScreenshot", true);
 				objCapabilities.setCapability("deviceReadyTimeout", "300");  //Timeout in seconds while waiting for device to become ready
@@ -179,22 +183,22 @@ public class CommonFunctionLib extends DetailedLogs {
 				objCapabilities.setCapability("session-override", true);
 //				objCapabilities.setCapability("device", "@default");
 //				objCapabilities.setCapability("avd", "myAndroidEmulator");  //Name of avd to launch
-//				objCapabilities.setCapability("appPackage", "com.yoolotto.android");
+				objCapabilities.setCapability("appPackage", "com.yoolotto.android");
 //				objCapabilities.setCapability("appActivity", "activities.MainActivity");
 //				objCapabilities.setCapability("appWaitActivity", "");
 //				objCapabilities.setCapability("appWaitPackage", "com.mobli");
 //				objCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 				try {   
-					driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
+					driver = new AndroidDriver(new URL("http://"+properties.getProperty("AppiumGridHubIP").trim()+":"+properties.getProperty("AppiumGridPortNum").trim()+"/wd/hub"), objCapabilities);
 					//driver = new AndroidDriver(new URL("http://" + properties.getProperty("machineIP") + ":" + properties.getProperty("PortNumber") + "/wd/hub"), objCapabilities);
-					Thread.sleep(4500);
+					Thread.sleep(1500);
 					break;
 				}
 				catch(org.openqa.selenium.SessionNotCreatedException ex){
 					try{
 						Thread.sleep(3000);
-						driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
-						Thread.sleep(4000);
+						driver = new AndroidDriver(new URL("http://"+properties.getProperty("AppiumGridHubIP").trim()+":"+properties.getProperty("AppiumGridPortNum").trim()+"/wd/hub"), objCapabilities);
+						Thread.sleep(1500);
 					}
 					catch(Exception e){
 						e.printStackTrace();
@@ -203,7 +207,7 @@ public class CommonFunctionLib extends DetailedLogs {
 				catch(UnreachableBrowserException e3){
 					try{
 						Thread.sleep(2000);
-						driver = new AndroidDriver(new URL("http://192.168.1.6:4724/wd/hub"), objCapabilities);
+						driver = new AndroidDriver(new URL("http://"+properties.getProperty("AppiumGridHubIP").trim()+":"+properties.getProperty("AppiumGridPortNum").trim()+"/wd/hub"), objCapabilities);
 						Thread.sleep(4000);
 					}
 					catch(Exception e){
@@ -211,13 +215,8 @@ public class CommonFunctionLib extends DetailedLogs {
 					}
 				}
 				catch (Exception e) {
-					e.printStackTrace();
-					try{
-						driver = new AndroidDriver(new URL("http://172.20.38.57:4724/wd/hub"), objCapabilities);
-					}
-					catch(Exception ex){
-						ex.printStackTrace();
-					}
+					Assert.fail("failed to start Driver. Skipping further steps.");
+
 				} 
 				break;
 			default:
@@ -259,10 +258,11 @@ public class CommonFunctionLib extends DetailedLogs {
              DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
              DefaultExecutor executor = new DefaultExecutor();
              executor.setExitValue(1);
-             CommandLine command = new CommandLine("/c appium.exe");
-             //command.addArgument("appium", false);
+             CommandLine command = new CommandLine("cmd");
+             command.addArgument("/c");
+             command.addArgument("appium.exe", false);
              command.addArgument("–-address", false);
-             command.addArgument("192.168.1.6");
+             command.addArgument("192.168.56.1");
              command.addArgument("--port", false);
              command.addArgument("4723");
              command.addArgument("--bootstrap-port", false);
@@ -454,16 +454,23 @@ public class CommonFunctionLib extends DetailedLogs {
 		}
 	}
 	
-	public void launchApp()
+	public void launchApp(Boolean resetReq)
 	{
 		if (driver!=null) {
 			try
-			{
-				driver.launchApp();
-				try {Thread.sleep(4000);} catch (InterruptedException e1) {}
+			{ // LaunchApp method does not work properly in Appium Java binding. Issue already created in Appium community. Below is a work around to achieve the same.
+				objCapabilities.setCapability("noReset", resetReq); 
+				driver = new AndroidDriver(new URL("http://"+properties.getProperty("AppiumGridHubIP").trim()+":"+properties.getProperty("AppiumGridPortNum").trim()+"/wd/hub"), objCapabilities);
+				CommonVariables.setDriver(driver);
+				try {Thread.sleep(3000);} catch (InterruptedException e1) {}
 			}
 			catch(WebDriverException e){
+				if(e.getMessage().toLowerCase().contains("unable to launch the app: error: trying to start logcat capture but it's already started")){
+					AddToLog(LogName.CurrentTestCaseLog, "pass", "Successfully find 'Tap the Camera' Pop-up box on the Home page. ");
+				}
 				try {Thread.sleep(2500);} catch (InterruptedException e1) {}	
+			} catch (MalformedURLException e) {
+				AddToLog(LogName.CurrentTestCaseLog, "error", "Failed to Launch App.");
 			}
 		}
 	}
@@ -630,22 +637,21 @@ public class CommonFunctionLib extends DetailedLogs {
 	{
 		try
 		{
-			AddToLog("CurrentTestCaseLog", "info", "Info: Get '"+attribute+"' Attribute value for '"+getElementXPath(objWebElement)+"' object ");
 			return objWebElement.getAttribute(attribute);
 		}
 		catch(org.openqa.selenium.NoSuchElementException e)
 		{
-			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'ElementNotFoundException' exception. Failed to get '"+ attribute +"' value for '"+objWebElement+"' on '"+driver.getTitle()+"' page");
+			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'ElementNotFoundException' exception. Failed to get '"+ attribute +"' value for '"+getElementXPath(objWebElement));
 			return "";
 		}
 		catch(ElementNotVisibleException e)
 		{
-			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'ElementNotVisibleException' exception. Failed to get '"+ attribute +"' value for '"+objWebElement+"' on '"+driver.getTitle()+"' page");
+			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'ElementNotVisibleException' exception. Failed to get '"+ attribute +"' value for '"+getElementXPath(objWebElement));
 			return "";
 		}
 		catch(WebDriverException e)
 		{
-			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'WebDriverException' exception. Failed to get '"+ attribute +"' value for '"+objWebElement+"' on '"+driver.getTitle()+"' page");
+			AddToLog("CurrentTestCaseLog", "info", "Error: caught 'WebDriverException' exception. Failed to get '"+ attribute +"' value for '"+getElementXPath(objWebElement));
 			return "";
 		}
 		catch(NullPointerException e5)
@@ -655,17 +661,9 @@ public class CommonFunctionLib extends DetailedLogs {
 		}
 		catch(Exception e)
 		{
-			System.out.println("Failed to find object ("+objWebElement+") property'"+attribute+"' value.");
 			AddToLog("CurrentTestCaseLog", "info", "Failed to get '"+ attribute +"' value. Error Message: "+e.getMessage());
 			return "";
 		}
-	}
-
-	public void Scroll(String Direction){
-		JavascriptExecutor js = (JavascriptExecutor) driver;
-		HashMap<String, String> scrollObject = new HashMap<String, String>();
-		scrollObject.put("direction", Direction);
-		js.executeScript("mobile: scroll", scrollObject);
 	}
 
 	public void ChangeOrientation(String Orientation){   // Valid values are: "LANDSCAPELEFT" , "LANDSCAPERIGHT" , "PORTRAIT"
@@ -673,23 +671,6 @@ public class CommonFunctionLib extends DetailedLogs {
 		//       String script = "target.setDeviceOrientation(UIA_DEVICE_ORIENTATION_" + Orientation + ");";
 		//        js.executeScript(script);
 		js.executeScript("target.setDeviceOrientation(UIA_DEVICE_ORIENTATION_LANDSCAPERIGHT);");
-	}
-
-	public boolean saveScreenshot(String ImgPath){
-		boolean flag = true;
-		try{			
-			File screenshot = null;;
-			//	            org.openqa.selenium.WebDriver augmentedDriver = new Augmenter().augment(driver);
-			WebDriver augmentedDriver = (AppiumDriver)(new Augmenter().augment(driver));
-			screenshot = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);
-
-			File screenshotfile = new File(ImgPath);
-			FileUtils.copyFile(screenshot, screenshotfile);
-		}catch(Exception e){
-			flag = false;
-			e.printStackTrace();
-		}
-		return flag;
 	}
 
 	public boolean IsElementVisible(final By locator) {
@@ -777,13 +758,18 @@ public class CommonFunctionLib extends DetailedLogs {
 
 	public void ScrollToBottom(){
 		try{
-			JavascriptExecutor js = (JavascriptExecutor)driver;
-			js.executeScript("window.scrollTo(0,document.documentElement.scrollHeight);");
-		}catch(Exception e){
-
+			Dimension screenSize = driver.manage().window().getSize();
+			driver.swipe(screenSize.getWidth()/2, screenSize.getHeight() - (screenSize.getHeight()/10), screenSize.getWidth()/2, screenSize.getHeight() - (screenSize.getHeight()*9/10), 500);
 		}
+		catch(Exception e1){}
 	}
 
+	public void ScrollToText(String value){
+		try{
+			driver.scrollTo(value);
+		}catch(Exception e){	}
+	}
+	
 	public String getElementXPath(WebElement element) {
 		try{
 			String str = element.toString().split("->")[1].trim();
@@ -797,9 +783,7 @@ public class CommonFunctionLib extends DetailedLogs {
 
 	//Function to Send Email Report
 	public void sendEmailReport(String from, String pass, String[] to, String subject, String htmlreportpath) {
-		//		File reader = new File("D:/Projects/Equinox/Automation/Java/New/logs/Results/2014_04_25_07_14_027_PM/iPad-Simulator/HighLevelLog.html");
 		BufferedReader reader = null;
-		//		htmlreportpath = "D:/Projects/Equinox/Automation/Java/New/logs/Results/2014_04_25_07_14_027_PM/iPad-Simulator/HighLevelLog.html";
 		try {
 			reader = new BufferedReader(
 					new FileReader(htmlreportpath));
@@ -1104,13 +1088,43 @@ public class CommonFunctionLib extends DetailedLogs {
 		try{
 			wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeScreenElem));
 		}
-		catch(TimeoutException e){
-			if(CommonVariables.CurrentTestCaseLog.get() != null){
-				AddToLog(LogName.CurrentTestCaseLog, "info", "Caught 'TimeoutException' exception while wait for element ( "+welcomeScreenElem.toString()+" ) visibility."); }
+		catch(TimeoutException e){}
+		catch(WebDriverException e){}
+	}
+
+	private boolean selectRBtnChck(By locator, String value){
+		try{
+			List<WebElement> options = FindElements(locator, 1);
+			if(options!=null){
+				for(WebElement eachOption : options){
+					String actualvalue = GetElementAttributeValue(eachOption, "text");
+					if(actualvalue==null  || actualvalue.isEmpty()){
+						actualvalue = GetElementAttributeValue(eachOption, "value");
+					}
+					if(actualvalue.trim().equalsIgnoreCase(value)){
+						if(!eachOption.isSelected()){
+							eachOption.click();
+							return true;
+						}
+					}
+				}
+				return false;
+			}
 			else{
-				AddToLog(LogName.CurrentTestClassLog, "info","Caught 'TimeoutException' exception while wait for element ( "+welcomeScreenElem.toString()+" ) visibility.");
+				return false;
 			}
 		}
+		catch(NullPointerException ex){
+			return false;
+		}
+	}
+
+	public boolean selectRadioButton(By locator, String value){
+		return selectRBtnChck(locator, value);
+	}
+
+	public boolean selectCheckbox(By locator, String value){
+		return selectRBtnChck(locator, value);
 	}
 }
 

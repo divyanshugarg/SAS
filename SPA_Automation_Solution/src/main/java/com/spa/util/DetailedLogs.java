@@ -1,13 +1,23 @@
 package com.spa.util;
+/**
+ * @author divyanshu.garg
+ */
+import io.appium.java_client.AppiumDriver;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.Augmenter;
 
 
 public class DetailedLogs {
@@ -101,12 +111,27 @@ public class DetailedLogs {
 			CommonVariables.CurrentTestCaseLog.get().info(LogMessage);
 		}else if(LogLevel.equalsIgnoreCase("error")){
 			CommonVariables.CurrentTestCaseLog.get().error(LogMessage);
+			try{
+				String ScreenShotPath = CommonVariables.ScenarioResultFolderPath.get() + "/" + "ScreenShots"+ "/" + CommonVariables.CurrentTestCaseName.get() + "_" + new Date().getTime() + ".jpg";
+				if(CommonVariables.getDriver()!=null)
+					if(!this.saveScreenshot(ScreenShotPath)){
+						ScreenShotPath = "Error Occurred while taking screenshot";
+					}
+				CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel.SCREENSHOT, ScreenShotPath);
+			}
+			catch(Exception e){
+			}
 		}else if(LogLevel.equalsIgnoreCase("screenshot")){
+			if(LogMessage==null || LogMessage.isEmpty()){
+				LogMessage = CommonVariables.ScenarioResultFolderPath.get() + "/" + "ScreenShots"+ "/" + CommonVariables.CurrentTestCaseName.get() + "_" + new Date().getTime() + ".jpg";
+			}
+			saveScreenshot(LogMessage);
 			CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel.SCREENSHOT, LogMessage);
 		}else if(LogLevel.equalsIgnoreCase("pass")){
 			CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel_Pass.PASS, LogMessage);
 		}
 	}
+
 	public void logCurrentGlobalLogs(String LogLevel, String LogMessage) {
 		if(LogLevel.equalsIgnoreCase("debug")){
 			CommonVariables.CurrentGlobalLog.get().debug(LogMessage);
@@ -114,12 +139,11 @@ public class DetailedLogs {
 			CommonVariables.CurrentGlobalLog.get().info(LogMessage);
 		}else if(LogLevel.equalsIgnoreCase("error")){
 			CommonVariables.CurrentGlobalLog.get().error(LogMessage);
-		}else if(LogLevel.equalsIgnoreCase("screenshot")){
-			CommonVariables.CurrentGlobalLog.get().log(CustomLog4JLevel.SCREENSHOT, LogMessage);
 		}else if(LogLevel.equalsIgnoreCase("pass")){
 			CommonVariables.CurrentTestCaseLog.get().log(CustomLog4JLevel_Pass.PASS, LogMessage);
 		}
 	}
+
 	public void logCurrentTestClassLogs(String LogLevel, String LogMessage) {
 		if (LogLevel.equalsIgnoreCase("debug")) {
 			CommonVariables.CurrentTestClassLog.get().debug(LogMessage);
@@ -134,5 +158,46 @@ public class DetailedLogs {
 		}
 	}
 
-
+	public boolean saveScreenshot(String ImgPath){
+		try{			
+			if(CommonVariables.getDriver() != null){
+				File screenshot = null;
+				if(CommonVariables.IsGridExecution.get()!=null & CommonVariables.IsGridExecution.get()){
+					try {
+						org.openqa.selenium.WebDriver augmentedDriver = new Augmenter().augment(CommonVariables.getDriver());
+						screenshot = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);
+					} catch (WebDriverException e) {
+						WebDriver augmentedDriver = (AppiumDriver)(new Augmenter().augment(CommonVariables.getDriver()));
+						screenshot = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);
+					}
+				}
+				else if(CommonVariables.getDriver().getClass().toString().toLowerCase().contains("chromedriver")
+						||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("safari")
+						||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("firefox")
+						||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("internet")
+						||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("ie")
+						||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("remotewebdriver")){
+					screenshot = ((TakesScreenshot) CommonVariables.getDriver()).getScreenshotAs(OutputType.FILE);
+				}
+				File screenshotfile = new File(ImgPath);
+				try {
+					FileUtils.copyFile(screenshot, screenshotfile);
+					if(CommonVariables.getDriver().getClass().toString().toLowerCase().contains("internet")
+							||CommonVariables.getDriver().getClass().toString().toLowerCase().contains("ie")){
+						Thread.sleep(1500);
+					}
+					return true;
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
+			else{
+				return false;
+			}
+		}
+		catch(Exception ex){
+			return false;
+		}
+	}
 }

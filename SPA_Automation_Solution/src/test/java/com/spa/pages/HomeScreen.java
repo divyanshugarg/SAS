@@ -7,7 +7,7 @@ import com.spa.objectrepository.HomeScreen_OR;
 import com.spa.util.MobileLocator;
 /**
  * 
- * @author Kapil
+ * @author Divyanshu Garg
  *
  */
 public class HomeScreen extends BasePage {
@@ -16,20 +16,23 @@ public class HomeScreen extends BasePage {
 	
 	public HomeScreen(){
 		objComFuncLib.waitforElementVisible(HomeScreen_OR.welcomeScreenElem,4);
-		while(i<=6){
-			//welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
-			objComFuncLib.SwipeLeft();
-			if (objComFuncLib.IsElementVisible(By.className("android.widget.Button")))
-			{
-				objComFuncLib.WebDriverClick(objComFuncLib.FindElement(By.className("android.widget.Button"), 10));
-				objComFuncLib.waitforElementVisible(HomeScreen_OR.jackpot,4);
-				break;
-			}
-			else{
-				i++;
+		if(!objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
+			i=0;
+			while(i<=5){
+				//welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
+				objComFuncLib.SwipeLeft();
+				if (objComFuncLib.IsElementVisible(By.name("OK,GOT IT")))
+				{
+					objComFuncLib.WebDriverClick(objComFuncLib.FindElement(By.className("android.widget.Button"), 10));
+					objComFuncLib.waitforElementVisible(HomeScreen_OR.jackpot,4);
+					break;
+				}
+				else{
+					i++;
+				}
 			}
 		}
-		if(objComFuncLib.FindElement(HomeScreen_OR.jackpot,0)==null){
+		if(!objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
 			throw new IllegalStateException("This is not the Home screen.");
 		}
 	}
@@ -39,7 +42,11 @@ public class HomeScreen extends BasePage {
 	 */
 	public StateChange clickOnJackPot(){
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.jackpot, 10));
+			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.jackpot, 8));
+			if(objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
+				objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.jackpot, 0));
+			}
+			Thread.sleep(2500);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -76,29 +83,25 @@ public class HomeScreen extends BasePage {
 	/**
 	 * @description: if HomepageInro pop display on page then click on Popup else click on Ticket button
 	 */
-	public boolean HomePagePopUp()
+	public void closeHomePagePopUpBox()
 	{
-
+		objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.HomeScreenPopUp, 10));
+	}
+	
+	public boolean isPopUpBoxDisplay()
+	{
 		try {
 			if (objComFuncLib.IsElementVisible(HomeScreen_OR.HomeScreenPopUp))
-					{
-						objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.HomeScreenPopUp, 10));
-						return true;
-						
-					}
+				return true;
 			else
 			{
-				ticket();
 				return false;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return false;
 		}
-	//	return this;
-		
 	}
+	
 	/**
 	 * @description: Click on Camera to Scan a ticket
 	 */

@@ -20,9 +20,9 @@ public class StateChange extends BasePage
 	/**
 	 * @description: Click on Jackpot to check the jackpot prizes of that day
 	 */
-	public void SelectState()
+	public boolean SelectState(String stateName)
 	{
-		//objComFuncLib.WebDriverClick(objComFuncLib.FindElements(StateChange_OR.StateDropDown, 2));
+		return objComFuncLib.selectRadioButton(StateChange_OR.StateDropDown, stateName);
 	}
 	public void confirm()
 	{

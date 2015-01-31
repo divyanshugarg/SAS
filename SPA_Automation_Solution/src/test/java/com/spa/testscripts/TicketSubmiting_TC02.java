@@ -18,7 +18,7 @@ public class TicketSubmiting_TC02 extends SAS_Engine{
   {
 	  objCommonFunc.SwipeRight();
 	  //OK,GotIt
-	  objHomeScreen.HomePagePopUp();
+	  objHomeScreen.closeHomePagePopUpBox();
 	  TicketScan Ticketscan = objHomeScreen.camera();
 	  objCommonFunc.SwipeRight();
 	  //GotIt Scan Intro need to be added
