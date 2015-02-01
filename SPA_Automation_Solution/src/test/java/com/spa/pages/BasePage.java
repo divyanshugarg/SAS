@@ -8,14 +8,17 @@ import java.util.Properties;
 
 import com.spa.util.CommonFunctionLib;
 import com.spa.util.CommonVariables;
+import com.spa.util.SystemUtilities;
 
 public class BasePage {
 	
-	CommonFunctionLib objComFuncLib;
+	CommonFunctionLib objCommonFunc;
+	SystemUtilities systemUtilities;
 	Properties properties;
 	
 	public BasePage(){
-		objComFuncLib = CommonVariables.getCommonFunctionLib();
+		objCommonFunc = CommonVariables.getCommonFunctionLib();
+		systemUtilities = new SystemUtilities();
 		properties = new Properties();
 		try {
 			FileReader reader = new FileReader("master_config.properties");

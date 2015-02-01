@@ -15,26 +15,27 @@ public class HomeScreen extends BasePage {
 	int i=0;
 	
 	public HomeScreen(){
-		objComFuncLib.waitforElementVisible(HomeScreen_OR.welcomeScreenElem,4);
-		if(!objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
+		objCommonFunc.waitforElementVisible(HomeScreen_OR.welcomeScreenElem,4);
+		if(!objCommonFunc.IsElementVisible(HomeScreen_OR.jackpot)){
 			i=0;
 			while(i<=5){
 				//welcomeScreenElem = objComFuncLib.FindElement(MobileLocator.ById, "com.yoolotto.android:id/relativeLL", 0);
-				objComFuncLib.SwipeLeft();
-				if (objComFuncLib.IsElementVisible(By.name("OK,GOT IT")))
+				objCommonFunc.SwipeLeft();
+				if (objCommonFunc.IsElementVisible(By.name("OK,GOT IT")))
 				{
-					objComFuncLib.WebDriverClick(objComFuncLib.FindElement(By.className("android.widget.Button"), 10));
-					objComFuncLib.waitforElementVisible(HomeScreen_OR.jackpot,4);
+					objCommonFunc.WebDriverClick(objCommonFunc.FindElement(By.className("android.widget.Button"), 10));
+					objCommonFunc.waitforElementVisible(HomeScreen_OR.jackpot,4);
 					break;
 				}
 				else{
 					i++;
 				}
 			}
+			if(!objCommonFunc.IsElementVisible(HomeScreen_OR.jackpot)){
+				throw new IllegalStateException("This is not the Home screen.");
+			}
 		}
-		if(!objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
-			throw new IllegalStateException("This is not the Home screen.");
-		}
+
 	}
 	
 	/**
@@ -42,9 +43,9 @@ public class HomeScreen extends BasePage {
 	 */
 	public StateChange clickOnJackPot(){
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.jackpot, 8));
-			if(objComFuncLib.IsElementVisible(HomeScreen_OR.jackpot)){
-				objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.jackpot, 0));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.jackpot, 8));
+			if(objCommonFunc.IsElementVisible(HomeScreen_OR.jackpot)){
+				objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.jackpot, 0));
 			}
 			Thread.sleep(2500);
 		} catch (Exception e) {
@@ -60,7 +61,7 @@ public class HomeScreen extends BasePage {
 	public void secondchance ()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.SecondChance, 10));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.SecondChance, 10));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,7 +74,7 @@ public class HomeScreen extends BasePage {
 	public void YooGames()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.YooGames, 10));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.YooGames, 10));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -85,13 +86,13 @@ public class HomeScreen extends BasePage {
 	 */
 	public void closeHomePagePopUpBox()
 	{
-		objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.HomeScreenPopUp, 10));
+		objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.HomeScreenPopUp, 10));
 	}
 	
 	public boolean isPopUpBoxDisplay()
 	{
 		try {
-			if (objComFuncLib.IsElementVisible(HomeScreen_OR.HomeScreenPopUp))
+			if (objCommonFunc.IsElementVisible(HomeScreen_OR.HomeScreenPopUp))
 				return true;
 			else
 			{
@@ -108,7 +109,7 @@ public class HomeScreen extends BasePage {
 	public TicketScan camera ()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.Camera, 10));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.Camera, 10));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -121,7 +122,7 @@ public class HomeScreen extends BasePage {
 	public void setting()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.Setting, 1));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.Setting, 1));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,7 +134,7 @@ public class HomeScreen extends BasePage {
 	public void navigation()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.Navigation, 2));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.Navigation, 2));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -145,7 +146,7 @@ public class HomeScreen extends BasePage {
 	public void ticket()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(HomeScreen_OR.Ticket, 2));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(HomeScreen_OR.Ticket, 2));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

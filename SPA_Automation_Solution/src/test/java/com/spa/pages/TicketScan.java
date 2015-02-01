@@ -5,7 +5,7 @@ import com.spa.objectrepository.TicketScan_OR;
 public class TicketScan extends BasePage{
 	public TicketScan()
 	{
-		if(objComFuncLib.FindElement(TicketScan_OR.ScanButton,5)==null){
+		if(objCommonFunc.FindElement(TicketScan_OR.ScanButton,5)==null){
 			throw new IllegalStateException("This is not the Home screen.");
 		}
 	}
@@ -13,7 +13,7 @@ public class TicketScan extends BasePage{
 	public TicketConfirmation ScanButtonClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.ScanButton, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.ScanButton, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -23,7 +23,7 @@ public class TicketScan extends BasePage{
 	public TicketScan FlashButtonClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.FlashButton, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.FlashButton, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -33,7 +33,7 @@ public class TicketScan extends BasePage{
 	public void HelpClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.HelpButton, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.HelpButton, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -42,7 +42,7 @@ public class TicketScan extends BasePage{
 	public TicketScan StateTabClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.stateTab, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.stateTab, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,7 +52,7 @@ public class TicketScan extends BasePage{
 	public TicketScan GameTabClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.GameTab, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.GameTab, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,7 +62,7 @@ public class TicketScan extends BasePage{
 	public TicketScan DateTabClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(TicketScan_OR.DateTab, 5));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(TicketScan_OR.DateTab, 5));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

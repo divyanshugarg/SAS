@@ -6,7 +6,7 @@ public class StateChange extends BasePage
 {
 		public StateChange()
 		{
-			if(objComFuncLib.FindElement(StateChange_OR.ConfirmButton,5)==null){
+			if(objCommonFunc.FindElement(StateChange_OR.ConfirmButton,5)==null){
 				throw new IllegalStateException("This is not the Home screen.");
 			}
 		}
@@ -15,17 +15,19 @@ public class StateChange extends BasePage
 	 */
 	public void ChangeState()
 	{
-		objComFuncLib.WebDriverClick(objComFuncLib.FindElement(StateChange_OR.ChangeStateButton, 2));
+		objCommonFunc.WebDriverClick(objCommonFunc.FindElement(StateChange_OR.ChangeStateButton, 2));
 	}
 	/**
 	 * @description: Click on Jackpot to check the jackpot prizes of that day
 	 */
 	public boolean SelectState(String stateName)
 	{
-		return objComFuncLib.selectRadioButton(StateChange_OR.StateDropDown, stateName);
+		return objCommonFunc.selectRadioButton(StateChange_OR.StateDropDown, stateName);
 	}
-	public void confirm()
+	public LotteryDetailsUnderAState confirm()
 	{
-		objComFuncLib.WebDriverClick(objComFuncLib.FindElement(StateChange_OR.ConfirmButton, 15));
+		objCommonFunc.WebDriverClick(objCommonFunc.FindElement(StateChange_OR.ConfirmButton, 10));
+		return new LotteryDetailsUnderAState();
+		
 	}
 }

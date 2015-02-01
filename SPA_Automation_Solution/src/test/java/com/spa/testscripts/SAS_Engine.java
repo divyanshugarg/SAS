@@ -35,11 +35,12 @@ import com.spa.util.CommonVariables;
 import com.spa.util.CustomLog4JLevel;
 import com.spa.util.DetailedLogs;
 import com.spa.util.HTMLReporting;
+import com.spa.util.SystemUtilities;
 
 public class SAS_Engine {
 	AppiumDriver driver;
 	CommonFunctionLib objCommonFunc;
-	//Properties properties; 
+	SystemUtilities systemUtilities;
 	DateFormat dateFormat;
 	public static long threadCount = 1;
 	Calendar startTime;
@@ -124,8 +125,7 @@ public class SAS_Engine {
 
 		  CommonVariables.CurrentGlobalLog.set(CommonVariables.DL.get().StartLogs("Global_Log",Report_Root_Path));
 		  CommonVariables.CurrentGlobalLog.get().info("Staring the Suite");	
-		  //		  objCommonFunc.AddToLog("info", "Staring the Suite");
-
+		  systemUtilities = new SystemUtilities();
 		  File highlevellogfile = new File(Report_Root_Path + "/" + "HighLevelLog" + ".log");
 		  FileWriter highlevellogfw = new FileWriter(highlevellogfile.getAbsoluteFile());
 		  CommonVariables.HighLevelLog.set(new BufferedWriter(highlevellogfw));

@@ -5,7 +5,7 @@ import com.spa.objectrepository.EmailFeed_OR;
 public class EmailFeed extends BasePage{
 	public EmailFeed()
 	{
-		if(objComFuncLib.FindElement(EmailFeed_OR.NoThanksButton,5)==null){
+		if(objCommonFunc.FindElement(EmailFeed_OR.NoThanksButton,5)==null){
 			throw new IllegalStateException("This is not the EmailFeed screen.");
 		}
 	}
@@ -13,7 +13,7 @@ public class EmailFeed extends BasePage{
 	public TicketSubmissionConfirmation SubmitButtonClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(EmailFeed_OR.SubmitButton, 10));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(EmailFeed_OR.SubmitButton, 10));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -24,7 +24,7 @@ public class EmailFeed extends BasePage{
 	public TicketSubmissionConfirmation NoThanksButtonClick()
 	{
 		try {
-			objComFuncLib.WebDriverClick(objComFuncLib.FindElement(EmailFeed_OR.NoThanksButton, 10));
+			objCommonFunc.WebDriverClick(objCommonFunc.FindElement(EmailFeed_OR.NoThanksButton, 10));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

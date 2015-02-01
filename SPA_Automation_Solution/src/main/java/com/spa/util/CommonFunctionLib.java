@@ -955,8 +955,7 @@ public class CommonFunctionLib extends DetailedLogs {
 			{
 				wait = new WebDriverWait(driver,timeoutInSeconds);
 				webElement = wait.until(
-						ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));                     	
-				webElement = driver.findElements(locator);
+						ExpectedConditions.presenceOfAllElementsLocatedBy(locator));                     	
 			}
 			else{
 				webElement = driver.findElements(locator);
