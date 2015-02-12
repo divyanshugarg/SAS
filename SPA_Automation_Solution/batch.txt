@@ -1,5 +1,7 @@
 cd D:
 D:
 cd D:\SPA\SAS\SPA_Automation_Solution
+call mvn build -U
+call mvn clean
 call mvn test
 pause

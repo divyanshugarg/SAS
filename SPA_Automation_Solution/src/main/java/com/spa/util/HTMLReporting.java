@@ -174,7 +174,7 @@ public class HTMLReporting {
 		tableFormat.append("<TABLE style=\"BACKGROUND-COLOR: #e2e7de; FONT-SIZE: 12px\" " +
 				"border=0 cellSpacing=1cellPadding=2 width=\"100%\"><TBODY><TR bgColor=#c1ccb8><TH " +
 				"style=\"TEXT-ALIGN: left; FONT-SIZE: 20px; FONT-WEIGHT: bold\"colSpan=2>" +
-				"Execution Summary : Mobile Equinox Regression Suite" +
+				"Execution Summary : SAS - High Level Execution Report" +
 				"</TH></TR><TR bgColor=#a1ccb8><TD width=\"45%\" scope=row>" +
 				"Passed TestCases" +
 				"</TD><TD style=\"PADDING-LEFT: 10px\">" +
